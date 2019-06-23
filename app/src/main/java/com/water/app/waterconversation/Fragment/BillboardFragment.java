@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -27,6 +28,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -40,8 +46,11 @@ import com.water.app.waterconversation.R;
 import com.water.app.waterconversation.Service.ForeService;
 import com.water.app.waterconversation.firebase.UploadData;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import static com.water.app.waterconversation.Activity.MainActivity.DeviceId;
 import static com.water.app.waterconversation.Activity.MainActivity.OpenAccidentAlarm;
@@ -343,7 +352,46 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
     private void setupBarChart(){
         BarChart barChart = getActivity().findViewById(R.id.barChart);
 
-        
+
+        List<BarEntry> barEntryList =new ArrayList<>();
+        barEntryList.add(new BarEntry(1, new float[]{1,2,3}));
+
+        BarDataSet barDataSet = new BarDataSet(barEntryList,"");
+        barDataSet.setColors(getColors());
+        barDataSet.setStackLabels(new String[]{"跌倒","昏迷","墜落"});
+
+        BarData barData = new BarData(barDataSet);
+        barData.setBarWidth(0.8f);
+
+        // Both of below can format the bar value.
+//        barData.setValueFormatter(new YAxisValueFormatter());
+        barDataSet.setValueFormatter(new YAxisValueFormatter());
+
+        barChart.getDescription().setEnabled(false);
+        barChart.setTouchEnabled(true);
+        barChart.setDragEnabled(false);
+        barChart.setScaleEnabled(false);
+        barChart.setPinchZoom(false);
+        barChart.setDoubleTapToZoomEnabled(false);
+        barChart.setData(barData);
+        barChart.setFitBars(true); // make the x-axis fit exactly all bars
+        barChart.invalidate(); // refresh
+
+    }
+
+    // This class used to format values of each bar from float to int.
+    private class YAxisValueFormatter extends ValueFormatter{
+
+        private DecimalFormat mFormat;
+
+        public YAxisValueFormatter() {
+            mFormat = new DecimalFormat("###,###,##0");
+        }
+        @Override
+        public String getFormattedValue(float value) {
+            return mFormat.format(value);
+        }
+
     }
 
 
@@ -703,6 +751,19 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
         } else {
             return capitalize(manufacturer) + " " + model;
         }
+    }
+
+    private int[] getColors() {
+
+        int stackSize = 3;
+
+        // have as many colors as stack-values per entry
+        int[] colors = new int[stackSize];
+
+        colors[0] = ColorTemplate.MATERIAL_COLORS[1]; //跌倒：黃色
+        colors[1] = Color.parseColor("#ff9800"); //昏迷：橘色
+        colors[2] = ColorTemplate.MATERIAL_COLORS[2]; //墜落：紅色
+        return colors;
     }
 
 
