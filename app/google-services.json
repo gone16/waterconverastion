@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "185826267369",
+    "firebase_url": "https://water-c1ecf.firebaseio.com",
+    "project_id": "water-c1ecf",
+    "storage_bucket": "water-c1ecf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:185826267369:android:e909de7443911a15",
+        "android_client_info": {
+          "package_name": "com.water.app.waterconversation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "185826267369-f2ofjkmqfsod70vked92a3qmebdun015.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.water.app.waterconversation",
+            "certificate_hash": "469ecb9a02f9f9c0881e77b2468dde731dd2706b"
+          }
+        },
+        {
+          "client_id": "185826267369-pmfpsmucu50qrv5ir3cvv4btlg6qk2oo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxhSV_wjZO1wvTNa-O3X6vzax7YsROsUU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "185826267369-pmfpsmucu50qrv5ir3cvv4btlg6qk2oo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

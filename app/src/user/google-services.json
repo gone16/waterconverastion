@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1082505655377",
+    "firebase_url": "https://water-user-ead4c.firebaseio.com",
+    "project_id": "water-user-ead4c",
+    "storage_bucket": "water-user-ead4c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1082505655377:android:e909de7443911a15",
+        "android_client_info": {
+          "package_name": "com.water.app.waterconversation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1082505655377-et0k183k1vajgqpaef0dtqkheo2m84jf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBi0fZ6BHlSuI-rE9DYhGx4VYCiN_slbvs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1082505655377-et0k183k1vajgqpaef0dtqkheo2m84jf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

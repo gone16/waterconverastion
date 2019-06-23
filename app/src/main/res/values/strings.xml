@@ -1,0 +1,101 @@
+<resources>
+    <!--app 名稱-->
+    <string name="app_name">水保計畫</string>
+
+    <!--頁面標題-->
+    <string name="billboard_title">看板</string>
+
+    <!--導覽列-->
+    <string name="title_billboard">看板</string>
+    <string name="title_location">位置</string>
+    <string name="title_setting">設定</string>
+    <string name="title_parameter">參數</string>
+
+    <!--login UI-->
+    <string name="textview_login_title">登入</string>
+    <string name="textview_login_userID">使用者代號</string>
+    <string name="textview_login_password">密碼</string>
+    <string name="button_login">登入</string>
+    <string name="button_register">註冊</string>
+    <string name="edittext_userID">請輸入使用者代號</string>
+    <string name="edittext_password">請輸入密碼</string>
+    <string name="alert_login_insert_userID">請輸入使用者代號</string>
+    <string name="alert_login_insert_userID_range">使用者代號至少需8個字元</string>
+    <string name="alert_login_insert_password">請輸入密碼</string>
+    <string name="alert_login_insert_password_range">密碼至少需6個字元</string>
+
+    <!--register UI-->
+    <string name="textview_register_title">註冊</string>
+    <string name="textview_register_userID">使用者代號</string>
+    <string name="textview_register_password">密碼</string>
+    <string name="textview_register_password2">確認密碼</string>
+    <string name="button_register_sure">確定</string>
+
+    <!--billboard UI-->
+    <string name="switch_accident">意外</string>
+    <string name="switch_precursor">前兆</string>
+    <string name="switch_location">位置</string>
+    <string name="switch_accident_alarm">意外警報</string>
+    <string name="switch_portent_alarm">前兆警報</string>
+    <string name="button_billboard_logout">登出</string>
+    <string name="button_start">開始偵測</string>
+    <string name="button_stop">停止偵測</string>
+    <string name="button_reset">重置資料</string>
+    <string name="alert_reset_title">確定要重置資料嗎?</string>
+    <string name="alert_reset_yes">確定</string>
+    <string name="alert_reset_no">否</string>
+    <string name="alert_logout">確定要登出嗎？</string>
+    <string name="text_accumulation_title">累計資訊</string>
+    <string name="text_accumulation_accident"></string>
+    <string name="text_accumulation_portent"></string>
+
+    <!--setting UI-->
+    <string name="text_setting_sensitivity">敏感度</string>
+    <string name="text_setting_sensitivity_drop">墜落</string>
+    <string name="text_setting_sensitivity_fall">跌倒</string>
+    <string name="text_setting_sensitivity_coma">昏迷</string>
+    <string name="text_setting_sensitivity_lost_balance">不穩</string>
+    <string name="text_setting_sensitivity_heavy_step">重踩</string>
+    <string name="text_setting_sensitivity_suddenly_wobbing">搖晃</string>
+
+
+
+    <!--billboard string-->
+    <string name="open_accident">開啟意外偵測</string>
+    <string name="close_accident">關閉意外偵測</string>
+    <string name="open_precursor">開啟前兆偵測</string>
+    <string name="close_precursor">關閉前兆偵測</string>
+    <string name="open_location">開啟位置偵測</string>
+    <string name="close_location">關閉位置偵測</string>
+    <string name="open_accident_alarm">開啟意外警報</string>
+    <string name="close_accident_alarm">關閉意外警報</string>
+    <string name="open_portent_alarm">開啟前兆警報</string>
+    <string name="close_Portent_alarm">關閉前兆警報</string>
+
+    <string name="start_detect">開始偵測</string>
+    <string name="stop_detect">停止偵測</string>
+    <string name="reset_data">重置資料</string>
+
+    <!--alarmReceiver UI-->
+    <string name="textview_alarm_alarm">警報</string>
+    <string name="textview_alarm_title">發生事故</string>
+    <string name="button_alarm_imOk">安全</string>
+    <string name="textView_alarm_wrong">偵測錯誤，我的狀況為：</string>
+
+    <string name="drop">墜落</string>
+    <string name="fall">跌倒</string>
+    <string name="coma">昏迷</string>
+    <string name="lost_balance">失去平衡</string>
+    <string name="heavy_step">突然重踩</string>
+    <string name="suddenly_wobbing">突然晃動</string>
+
+    <!--sharedPreferences key-->
+    <string name="sharePreferences_user">user</string>
+    <string name="sharePreferences_site">site</string>
+    <string name="sharePreferences_drop">drop</string>
+    <string name="sharePreferences_fall">fall</string>
+    <string name="sharePreferences_coma">coma</string>
+    <string name="sharePreferences_lost_balance">lost_balance</string>
+    <string name="sharePreferences_heavy_step">heavy_step</string>
+    <string name="sharePreferences_suddenly_wobbing">suddenly_wobbing</string>
+</resources>

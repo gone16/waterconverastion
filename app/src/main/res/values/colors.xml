@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimaryDark">#1976D2</color>
+    <color name="colorPrimaryLight">#BBDEFB</color>
+    <color name="colorAccent">#03A9F4</color>
+    <color name="colorPrimaryText">#212121</color>
+    <color name="colorSecondaryText">#757575</color>
+
+    <color name="color_stop_detect">#ff5722</color>
+
+    <color name="color_drop">#f44336</color>
+    <color name="color_fall">#ff6e40</color>
+    <color name="color_coma">#ffab91</color>
+    <color name="color_lost_balance">#3949ab</color>
+    <color name="color_heavy_step">#8e24aa</color>
+    <color name="color_suddenly_wobbing">#7c4dff</color>
+</resources>

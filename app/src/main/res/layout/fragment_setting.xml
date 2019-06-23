@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<android.support.constraint.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/textView_setting_sensitivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="400dp"
+        android:layout_marginBottom="144dp"
+        android:text="@string/text_setting_sensitivity"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <SeekBar
+        android:id="@+id/seekBar_setting_drop"
+        android:layout_width="120dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline6"
+        app:layout_constraintTop_toBottomOf="@+id/textView_setting_sensitivity" />
+
+    <SeekBar
+        android:id="@+id/seekBar_setting_fall"
+        android:layout_width="120dp"
+        android:layout_height="21dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline6"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar_setting_drop" />
+
+    <SeekBar
+        android:id="@+id/seekBar_setting_coma"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline6"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar_setting_fall" />
+
+    <SeekBar
+        android:id="@+id/seekBar_setting_lost_balance"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toEndOf="@+id/text_setting_sensitivity_lost_balance"
+        app:layout_constraintTop_toBottomOf="@+id/textView_setting_sensitivity" />
+
+    <SeekBar
+        android:id="@+id/seekBar_setting_heavy_step"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toEndOf="@+id/text_setting_sensitivity_heavy_step"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar_setting_lost_balance" />
+
+    <SeekBar
+        android:id="@+id/seekBar_setting_suddenly_wobbing"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toEndOf="@+id/text_setting_sensitivity_suddenly_wobbing"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar_setting_heavy_step" />
+
+    <TextView
+        android:id="@+id/text_setting_sensitivity_drop"
+        android:layout_width="wrap_content"
+        android:layout_height="24sp"
+        android:text="@string/text_setting_sensitivity_drop"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/seekBar_setting_drop"
+        app:layout_constraintTop_toTopOf="@+id/seekBar_setting_drop" />
+
+    <TextView
+        android:id="@+id/text_setting_sensitivity_fall"
+        android:layout_width="wrap_content"
+        android:layout_height="24sp"
+        android:text="@string/text_setting_sensitivity_fall"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/seekBar_setting_fall"
+        app:layout_constraintTop_toTopOf="@+id/seekBar_setting_fall" />
+
+    <TextView
+        android:id="@+id/text_setting_sensitivity_coma"
+        android:layout_width="wrap_content"
+        android:layout_height="24sp"
+        android:text="@string/text_setting_sensitivity_coma"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/seekBar_setting_coma"
+        app:layout_constraintTop_toTopOf="@+id/seekBar_setting_coma" />
+
+    <TextView
+        android:id="@+id/text_setting_sensitivity_lost_balance"
+        android:layout_width="wrap_content"
+        android:layout_height="24sp"
+        android:layout_marginStart="8dp"
+        android:text="@string/text_setting_sensitivity_lost_balance"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/guideline6"
+        app:layout_constraintTop_toTopOf="@+id/seekBar_setting_lost_balance" />
+
+    <TextView
+        android:id="@+id/text_setting_sensitivity_heavy_step"
+        android:layout_width="wrap_content"
+        android:layout_height="24sp"
+        android:layout_marginStart="8dp"
+        android:text="@string/text_setting_sensitivity_heavy_step"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/seekBar_setting_heavy_step"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline6"
+        app:layout_constraintTop_toTopOf="@+id/seekBar_setting_heavy_step" />
+
+    <TextView
+        android:id="@+id/text_setting_sensitivity_suddenly_wobbing"
+        android:layout_width="wrap_content"
+        android:layout_height="24sp"
+        android:layout_marginStart="8dp"
+        android:text="@string/text_setting_sensitivity_suddenly_wobbing"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/guideline6"
+        app:layout_constraintTop_toTopOf="@+id/seekBar_setting_suddenly_wobbing" />
+
+    <EditText
+        android:id="@+id/editText_settingfragment_name"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="128dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toEndOf="@+id/textView_settingfragment_name"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editText_settingfragment_site"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toEndOf="@+id/textView_settingfragment_name"
+        app:layout_constraintTop_toBottomOf="@+id/editText_settingfragment_name" />
+
+    <Button
+        android:id="@+id/button_settingfragment_save"
+        android:layout_width="wrap_content"
+        android:layout_height="43dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="180dp"
+        android:layout_marginEnd="24dp"
+        android:text="儲存"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.448"
+        app:layout_constraintStart_toEndOf="@+id/editText_settingfragment_site"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_settingfragment_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="132dp"
+        android:text="姓名或代號"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_settingfragment_site"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:text="工地代號"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_settingfragment_name" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="180dp"
+        android:layout_marginEnd="204dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_begin="191dp"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</android.support.constraint.ConstraintLayout>
+</ScrollView>
