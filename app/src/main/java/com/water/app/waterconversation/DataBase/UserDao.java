@@ -21,6 +21,8 @@ public interface UserDao {
     @Query("SELECT * FROM user WHERE portent = :state")
     List<User> findPortentByState(Integer state);
 
+    @Query("SELECT * FROM user WHERE accident =:state AND date =:date")
+    List<User> findAccidentByStateAndDate(Integer state, String date);
 
 
     @Insert
@@ -29,4 +31,7 @@ public interface UserDao {
 
     @Delete
     void delete(User user);
+
+    @Query("DELETE FROM user")
+     void deleteAll();
 }

@@ -11,9 +11,9 @@ public class CSVDataBean {
     public int accident,accidentAns,portent,portentAns;
     public String site;
     public float altitude;
-    public float heartRate;
+    public int heartRate;
 
-    public CSVDataBean(String id, String idDevice, String date, String time, float latitude, float longitude, float accX, float accY, float accZ, int accident, int accidentAns, int portent, int portentAns, String site, float altitude,float heartRate) {
+    public CSVDataBean(String id, String idDevice, String date, String time, float latitude, float longitude, float accX, float accY, float accZ, int accident, int accidentAns, int portent, int portentAns, String site, float altitude,int heartRate) {
         this.id = id;
         this.idDevice = idDevice;
         this.date = date;
@@ -96,7 +96,7 @@ public class CSVDataBean {
         this.altitude = altitude;
     }
 
-    public void setHeartRate(float heartRate) {
+    public void setHeartRate(int heartRate) {
         this.heartRate = heartRate;
     }
 
@@ -160,7 +160,7 @@ public class CSVDataBean {
         return altitude;
     }
 
-    public float getHeartRate() {
+    public int getHeartRate() {
         return heartRate;
     }
 }

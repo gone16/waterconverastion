@@ -13,14 +13,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="400dp"
+        android:layout_marginTop="32dp"
         android:layout_marginBottom="144dp"
         android:text="@string/text_setting_sensitivity"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/button_setting_pair_wristband" />
 
     <SeekBar
         android:id="@+id/seekBar_setting_drop"
@@ -137,7 +136,7 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="128dp"
+        android:layout_marginTop="72dp"
         android:ems="10"
         android:inputType="textPersonName"
         app:layout_constraintStart_toEndOf="@+id/textView_settingfragment_name"
@@ -159,9 +158,9 @@
         android:layout_width="wrap_content"
         android:layout_height="43dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="180dp"
+        android:layout_marginTop="124dp"
         android:layout_marginEnd="24dp"
-        android:text="儲存"
+        android:text="@string/button_setting_save"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.448"
         app:layout_constraintStart_toEndOf="@+id/editText_settingfragment_site"
@@ -172,8 +171,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="132dp"
-        android:text="姓名或代號"
+        android:layout_marginTop="80dp"
+        android:text="@string/text_setting_name"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -184,7 +183,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
-        android:text="工地代號"
+        android:text="@string/text_setting_site"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_settingfragment_name" />
@@ -199,6 +198,69 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintGuide_begin="191dp"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/text_version"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_setting_pair_wristband"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:text="@string/button_setting_pair_wristband"
+        android:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@+id/button_setting_comfirm_wristband"
+        app:layout_constraintTop_toBottomOf="@+id/textview_setting_wristband_connect_state" />
+
+    <TextView
+        android:id="@+id/textview_setting_wristband_connect_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/text_setting_connect_state"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText_settingfragment_site" />
+
+    <!--<Button-->
+        <!--android:id="@+id/button"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Button"-->
+        <!--tools:layout_editor_absoluteX="16dp"-->
+        <!--tools:layout_editor_absoluteY="38dp"-->
+        <!--android:visibility="gone"/>-->
+
+    <Button
+        android:id="@+id/button_setting_comfirm_wristband"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/button_setting_comfirm_wristband"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/button_setting_pair_wristband" />
+
+    <Button
+        android:id="@+id/button_setting_disconnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:text="@string/button_setting_disconnect"
+        app:layout_constraintStart_toEndOf="@+id/button_setting_comfirm_wristband"
+        app:layout_constraintTop_toTopOf="@+id/button_setting_comfirm_wristband" />
 
 </android.support.constraint.ConstraintLayout>
 </ScrollView>

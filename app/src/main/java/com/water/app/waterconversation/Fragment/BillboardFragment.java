@@ -1,5 +1,6 @@
 package com.water.app.waterconversation.Fragment;
 
+import android.arch.persistence.room.Room;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,20 +29,30 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.water.app.waterconversation.Constants;
+import com.water.app.waterconversation.DataBase.AppDatabase;
+import com.water.app.waterconversation.DataBase.UpdateAccumulationBarChartAfterDBOperation;
 import com.water.app.waterconversation.DataBase.UpdateAccumulationTextAfterDBOperation;
+import com.water.app.waterconversation.DataBase.UserDao;
 import com.water.app.waterconversation.DataBase.UserRepository;
 import com.water.app.waterconversation.GlobalVariable;
+import com.water.app.waterconversation.MyTime;
 import com.water.app.waterconversation.R;
 import com.water.app.waterconversation.Service.ForeService;
 import com.water.app.waterconversation.firebase.UploadData;
@@ -51,14 +62,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static com.water.app.waterconversation.Activity.MainActivity.DeviceId;
 import static com.water.app.waterconversation.Activity.MainActivity.OpenAccidentAlarm;
 import static com.water.app.waterconversation.Activity.MainActivity.OpenPortentAlarm;
-import static com.water.app.waterconversation.Activity.MainActivity.Site;
-import static com.water.app.waterconversation.Activity.MainActivity.UserId;
 
-public class BillboardFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, View.OnClickListener, ForeService.CallBacks, UpdateAccumulationTextAfterDBOperation {
+public class BillboardFragment extends Fragment implements CompoundButton.OnCheckedChangeListener, View.OnClickListener, ForeService.CallBacks, UpdateAccumulationTextAfterDBOperation, UpdateAccumulationBarChartAfterDBOperation {
 
     private static final String TAG = "BillboardFragment";
 
@@ -70,6 +82,9 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
     private ValueEventListener valueEventListener;
     private DataSnapshot dataSnapshotAll;
 
+    private String UserId;
+    private String Site;
+
 //    Handler handler = new Handler();
 
     EditText editTextName;
@@ -78,7 +93,7 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
     //處理Accumulation textview的array
     int[] textArray  = new int[]{0, 0, 0, 0, 0, 0};
 
-    private UserRepository userRepository;
+
 
 //    GlobalVariable globalVariable = (GlobalVariable) getActivity().getApplicationContext();
 
@@ -112,61 +127,7 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
     }
 
 
-    //更新Accumulation text的動作
-    public void updateAccumulationTextAfterDBOperation(int[] result){
 
-        int type = result[0];
-        int state = result[1];
-        int size =  result[2];
-
-        Log.d(TAG, "afterDBOperation: "+type +state+size);
-//        int[] textArray = new int[6];
-
-
-        switch (type){
-            case Constants.TYPE.ACCIDENT:
-                switch (state){
-                    case Constants.ACCIDENTS.DROP:
-                        textArray[0] = size;
-                        break;
-                    case Constants.ACCIDENTS.FALL:
-                        textArray[1] = size;
-                        break;
-                    case Constants.ACCIDENTS.COMA:
-                        textArray[2] = size;
-                        break;
-                }
-                break;
-            case Constants.TYPE.PORTENT:
-                switch (state){
-                    case Constants.PORTENTS.LOST_BALANCE:
-                        textArray[3] = size;
-                        break;
-                    case Constants.PORTENTS.HEAVY_STEP:
-                        textArray[4] = size;
-                        break;
-                    case Constants.PORTENTS.SUDDENLY_WOBBING:
-                        textArray[5] = size;
-                        break;
-                }
-                break;
-        }
-
-        final TextView textViewAccident = getActivity().findViewById(R.id.text_accumulation_accident);
-        final TextView textViewPortent = getActivity().findViewById(R.id.text_accumulation_portent);
-
-        try{
-            textViewAccident.setText("墜落："+textArray[0]+ "次\n"+
-                        "跌倒："+textArray[1]+ "次\n" +
-                        "昏迷："+textArray[2]+ "次");
-                textViewPortent.setText("失去平衡："+textArray[3] + "次\n" +
-                        "突然重踩："+textArray[4]+ "次\n" +
-                        "突然晃動："+textArray[5]+"次");
-        }catch (Exception e){
-            Log.e(TAG, "afterDBOperation: ",e );
-        }
-
-    }
 
 
     //複製user到water-user資料庫
@@ -224,7 +185,7 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
         Intent intent = new Intent(getActivity(), ForeService.class);
         intent.setAction("Bind");
         GlobalVariable globalVariable = (GlobalVariable) getActivity().getApplicationContext();
-        if(globalVariable.getIsDetecting()) getActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        if(globalVariable.getDetecting()) getActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
         isBillBoardFragment = true;
     }
 
@@ -242,7 +203,7 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
 //        handler.removeCallbacks(runnable);
 
         GlobalVariable globalVariable = (GlobalVariable) getActivity().getApplicationContext();
-        if(globalVariable.getIsDetecting()) getActivity().unbindService(serviceConnection);
+        if(globalVariable.getDetecting()) getActivity().unbindService(serviceConnection);
 
         isBillBoardFragment = false;
     }
@@ -286,8 +247,11 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
         // 設定累計資訊的次數的textview
         setAccumulationText();
 
-        // This function will setup BarChart of accidents and portents
+        // This function will setup accidents and portents of BarChart.
         setupBarChart();
+
+        // This function will setup accidents and portents of LineChart.
+//        setupLineChart();
 
         Log.d(TAG, "setUI() completed.");
 
@@ -297,6 +261,7 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
 
     //設定累計textview
     private void setAccumulationText(){
+        UserRepository userRepository;
         userRepository = new UserRepository(getActivity().getApplicationContext());
         userRepository.setDelegate(this);
 
@@ -307,75 +272,265 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
         userRepository.getPortentByState(Constants.PORTENTS.LOST_BALANCE);
         userRepository.getPortentByState(Constants.PORTENTS.HEAVY_STEP);
         userRepository.getPortentByState(Constants.PORTENTS.SUDDENLY_WOBBING);
-//        final TextView textViewAccident = getActivity().findViewById(R.id.text_accumulation_accident);
-//        final TextView textViewPortent = getActivity().findViewById(R.id.text_accumulation_portent);
-//        final int[] textArray;
-//        textArray = new int[6];
-//
-//        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(2, 15, 1,
-//                TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(3),
-//                new ThreadPoolExecutor.DiscardOldestPolicy());
-//        threadPool.execute(new Runnable() {
-//            @SuppressLint("SetTextI18n")
-//            @Override
-//            public void run() {
-//                AppDatabase appDatabase = Room.databaseBuilder(getContext(),
-//                        AppDatabase.class, "User").build();
-//
-//                UserDao userDao = appDatabase.getUserDao();
-//                List<User> dropList = userDao.findAccidentByState(Constants.ACCIDENTS.DROP);
-//                List<User> fallList = userDao.findAccidentByState(Constants.ACCIDENTS.FALL);
-//                List<User> comaList = userDao.findAccidentByState(Constants.ACCIDENTS.COMA);
-//                List<User> lostBalanceList = userDao.findPortentByState(Constants.PORTENTS.LOST_BALANCE);
-//                List<User> heavyStepList = userDao.findPortentByState(Constants.PORTENTS.HEAVY_STEP);
-//                List<User> suddenlyWobbingList = userDao.findPortentByState(Constants.PORTENTS.SUDDENLY_WOBBING);
-//                textArray[0] = dropList.size();
-//                textArray[1] = fallList.size();
-//                textArray[2] = comaList.size();
-//                textArray[3] = lostBalanceList.size();
-//                textArray[4] = heavyStepList.size();
-//                textArray[5] = suddenlyWobbingList.size();
-//
-//                Log.i(TAG, "getAccumulation: "+textArray[0]+textArray[1]+textArray[2]);
-//
-//                textViewAccident.setText("墜落："+textArray[0] + "次\n" +
-//                        "跌倒："+textArray[1]+ "次\n" +
-//                        "昏迷："+textArray[2]+ "次");
-//                textViewPortent.setText("失去平衡："+textArray[3] + "次\n" +
-//                        "突然重踩："+textArray[4]+ "次\n" +
-//                        "突然晃動："+textArray[5]+"次");
-////                    new QueryAsyncTask(userDao).execute(user);
-//            }
-//        });
+    }
+
+    //更新Accumulation text的動作
+    public void updateAccumulationTextAfterDBOperation(int[] result){
+
+        int type = result[0];
+        int state = result[1];
+        int size =  result[2];
+
+        Log.d(TAG, "afterDBOperation: "+type +state+size);
+//        int[] textArray = new int[6];
+
+
+        switch (type){
+            case Constants.TYPE.ACCIDENT:
+                switch (state){
+                    case Constants.ACCIDENTS.DROP:
+                        textArray[0] = size;
+                        break;
+                    case Constants.ACCIDENTS.FALL:
+                        textArray[1] = size;
+                        break;
+                    case Constants.ACCIDENTS.COMA:
+                        textArray[2] = size;
+                        break;
+                }
+                break;
+            case Constants.TYPE.PORTENT:
+                switch (state){
+                    case Constants.PORTENTS.LOST_BALANCE:
+                        textArray[3] = size;
+                        break;
+                    case Constants.PORTENTS.HEAVY_STEP:
+                        textArray[4] = size;
+                        break;
+                    case Constants.PORTENTS.SUDDENLY_WOBBING:
+                        textArray[5] = size;
+                        break;
+                }
+                break;
+        }
+
+        final TextView textViewAccident = getActivity().findViewById(R.id.text_accumulation_accident);
+        final TextView textViewPortent = getActivity().findViewById(R.id.text_accumulation_portent);
+
+        try{
+            textViewAccident.setText("墜落："+textArray[0]+ "次\n"+
+                    "跌倒："+textArray[1]+ "次\n" +
+                    "昏迷："+textArray[2]+ "次");
+            textViewPortent.setText("失去平衡："+textArray[3] + "次\n" +
+                    "突然重踩："+textArray[4]+ "次\n" +
+                    "突然晃動："+textArray[5]+"次");
+        }catch (Exception e){
+            Log.e(TAG, "afterDBOperation: ",e );
+        }
+
     }
 
     private void setupBarChart(){
+        UserRepository userRepository;
+        userRepository = new UserRepository(getActivity().getApplicationContext());
+        userRepository.setDelegateBar(this);
+
+        userRepository.getAccidentByStateAndDate(1,"2019-06-24");
+    }
+
+    @Override
+    public void updateAccumulationBarChart(float[] result) {
+        Log.d(TAG, "updateAccumulationBarChart: ");
+
+        try{
         BarChart barChart = getActivity().findViewById(R.id.barChart);
 
-
         List<BarEntry> barEntryList =new ArrayList<>();
-        barEntryList.add(new BarEntry(1, new float[]{1,2,3}));
+        for(int i = 0; i<12 ; i++){
+            barEntryList.add(new BarEntry(i+1,new float[]{result[i], result[i+12], result[i+24], result[i+36]}));
+        }
+
+//        for(int i =0; i<12; i++){
+//            barEntryList.add(new BarEntry(i+1,new float[]{i%2,i%3,i%4,i%5}));
+//        }
 
         BarDataSet barDataSet = new BarDataSet(barEntryList,"");
         barDataSet.setColors(getColors());
-        barDataSet.setStackLabels(new String[]{"跌倒","昏迷","墜落"});
+        barDataSet.setStackLabels(new String[]{"前兆","墜落","跌倒","昏迷"});
 
         BarData barData = new BarData(barDataSet);
         barData.setBarWidth(0.8f);
+
+        XAxis xAxis= barChart.getXAxis();
+        YAxis yAxisL = barChart.getAxisLeft();
+        YAxis yAxisR = barChart.getAxisRight();
+
+        xAxis.setAxisMinimum(0.0f);
+//        xAxis.setAxisMaximum(12.0f);
+        xAxis.setValueFormatter(new XAxisValueFormatter());
+
+        yAxisL.setAxisMinimum(0.0f);
+        yAxisR.setAxisMinimum(0.0f);
+        yAxisL.setValueFormatter(new YAixValueFormatterForLR());
+        yAxisR.setValueFormatter(new YAixValueFormatterForLR());
 
         // Both of below can format the bar value.
 //        barData.setValueFormatter(new YAxisValueFormatter());
         barDataSet.setValueFormatter(new YAxisValueFormatter());
 
-        barChart.getDescription().setEnabled(false);
-        barChart.setTouchEnabled(true);
-        barChart.setDragEnabled(false);
-        barChart.setScaleEnabled(false);
-        barChart.setPinchZoom(false);
-        barChart.setDoubleTapToZoomEnabled(false);
-        barChart.setData(barData);
-        barChart.setFitBars(true); // make the x-axis fit exactly all bars
-        barChart.invalidate(); // refresh
+            barChart.getDescription().setEnabled(false);
+            barChart.setTouchEnabled(true);
+            barChart.setDragEnabled(false);
+            barChart.setScaleEnabled(false);
+            barChart.setPinchZoom(false);
+            barChart.setDoubleTapToZoomEnabled(false);
+            barChart.setData(barData);
+            barChart.setFitBars(true); // make the x-axis fit exactly all bars
+            barChart.invalidate(); // refresh
+        }catch (Exception e){
+            Log.e(TAG, "updateAccumulationBarChart: ",e );
+        }
+
+        try {
+        LineChart lineChart = getActivity().findViewById(R.id.lineChart);
+
+        List<Entry> PortentsList = new ArrayList<Entry>();
+        List<Entry> DropList = new ArrayList<Entry>();
+        List<Entry> FallList = new ArrayList<Entry>();
+        List<Entry> ComaList = new ArrayList<Entry>();
+
+
+        for(int i=0; i<12; i++){
+            PortentsList.add(new Entry(i+1, result[i]));
+            DropList.add(new Entry(i + 1, result[i+12]));
+            FallList.add(new Entry(i + 1, result[i+24]));
+            ComaList.add(new Entry(i + 1, result[i+36]));
+        }
+
+//        for(int i =0; i<13; i++){
+//            if(i==12){
+//                PortentsList.add(new Entry());
+//                DropList.add(new Entry());
+//                FallList.add(new Entry());
+//                ComaList.add(new Entry());
+//            }else {
+//                PortentsList.add(new Entry(i + 1, i % 2));
+//                DropList.add(new Entry(i + 1, i % 3));
+//                FallList.add(new Entry(i + 1, i % 4));
+//                ComaList.add(new Entry(i + 1, i % 5));
+//            }
+//        }
+
+        LineDataSet PortentDataSet = new LineDataSet(PortentsList, "前兆");
+        LineDataSet DropDataSet = new LineDataSet(DropList, "墜落");
+        LineDataSet FallDataSet = new LineDataSet(FallList, "跌倒");
+        LineDataSet ComaDataSet = new LineDataSet(ComaList, "昏迷");
+
+        PortentDataSet.setCircleColor(Color.parseColor("#a1887f"));
+        DropDataSet.setCircleColor(Color.parseColor("#ff3d00"));
+        FallDataSet.setCircleColor(Color.parseColor("#ffea00"));
+        ComaDataSet.setCircleColor(Color.parseColor("#ffab40"));
+
+        PortentDataSet.setColors(Color.parseColor("#a1887f"));
+        DropDataSet.setColors(Color.parseColor("#ff3d00"));
+        FallDataSet.setColors(Color.parseColor("#ffea00"));
+        ComaDataSet.setColors(Color.parseColor("#ffab40"));
+
+        List<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
+
+
+        // 危險程度低的先畫，畫折線圖的時候才不會被蓋過去
+        dataSets.add(PortentDataSet);
+        dataSets.add(FallDataSet);
+        dataSets.add(ComaDataSet);
+        dataSets.add(DropDataSet);
+        LineData data = new LineData(dataSets);
+
+        XAxis xAxisLine= lineChart.getXAxis();
+        YAxis yAxisLLine = lineChart.getAxisLeft();
+        YAxis yAxisRLine = lineChart.getAxisRight();
+
+        xAxisLine.setAxisMinimum(0.0f);
+//        xAxisLine.setAxisMaximum(12.0f);
+        xAxisLine.setValueFormatter(new XAxisValueFormatter());
+
+        yAxisLLine.setAxisMinimum(0.0f);
+        yAxisRLine.setAxisMinimum(0.0f);
+        yAxisLLine.setValueFormatter(new YAixValueFormatterForLR());
+        yAxisRLine.setValueFormatter(new YAixValueFormatterForLR());
+
+        data.setValueFormatter(new YAxisValueFormatter());
+
+
+            lineChart.getDescription().setEnabled(false);
+            lineChart.setTouchEnabled(true);
+            lineChart.setDragEnabled(false);
+            lineChart.setScaleEnabled(false);
+            lineChart.setPinchZoom(false);
+            lineChart.setDoubleTapToZoomEnabled(false);
+            lineChart.setData(data);
+            lineChart.invalidate(); // refresh
+        }catch (Exception e){
+            Log.e(TAG, "updateAccumulationBarChart: ",e );
+        }
+
+
+    }
+
+
+    private String transformHour(int hour, int index){
+        if(hour>index){
+            return String.valueOf(hour-index);
+        }else {
+            return String.valueOf(24+hour-index);
+        }
+    }
+
+    private class XAxisValueFormatter extends ValueFormatter{
+
+        private DecimalFormat mFormat;
+
+        public XAxisValueFormatter() {
+            mFormat = new DecimalFormat("###,###,##0");
+        }
+        @Override
+        public String getFormattedValue(float value) {
+            MyTime myTime = new MyTime();
+            int hour =Integer.valueOf(myTime.getCurrentHour());
+
+            int index = (int)value;
+//            return transformHour(hour,index);
+            switch (index){
+                case 0:
+                    return "";
+                case 1:
+                    return transformHour(hour,12);
+                case 2:
+                    return transformHour(hour,11);
+                case 3:
+                    return transformHour(hour,10);
+                case 4:
+                    return transformHour(hour,9);
+                case 5:
+                    return transformHour(hour,8);
+                case 6:
+                    return transformHour(hour,7);
+                case 7:
+                    return transformHour(hour,6);
+                case 8:
+                    return transformHour(hour,5);
+                case 9:
+                    return transformHour(hour,4);
+                case 10:
+                    return transformHour(hour,3);
+                case 11:
+                    return transformHour(hour,2);
+                case 12:
+                    return transformHour(hour,1);
+
+            }
+            return mFormat.format(value);
+        }
 
     }
 
@@ -389,6 +544,46 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
         }
         @Override
         public String getFormattedValue(float value) {
+
+            if(value == 0.0f){
+                return "";
+            }
+            return mFormat.format(value);
+        }
+
+    }
+
+    private class YAixValueFormatterForLR extends ValueFormatter{
+        private DecimalFormat mFormat;
+
+        public YAixValueFormatterForLR() {
+            mFormat = new DecimalFormat("###,###,##0");
+        }
+        @Override
+        public String getFormattedValue(float value) {
+            if(value%1 !=0){
+                return "";
+            }
+            return mFormat.format(value);
+        }
+    }
+
+    // This class used to format values of each bar from float to int.
+    private class YAxisValueFormatterLine extends ValueFormatter{
+
+        private DecimalFormat mFormat;
+
+        public YAxisValueFormatterLine() {
+            mFormat = new DecimalFormat("###,###,##0");
+        }
+
+
+        @Override
+        public String getFormattedValue(float value) {
+
+            if(value == 0.0f){
+                return "";
+            }
             return mFormat.format(value);
         }
 
@@ -502,12 +697,12 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
                 final SharedPreferences.Editor editor = sharedPreferences.edit();
 
                 //確認工地代碼不為空
-                if(sharedPreferences.getString(getResources().getString(R.string.sharePreferences_site),"").equals("") && !globalVariable.getIsDetecting()){
+                if(sharedPreferences.getString(getResources().getString(R.string.sharePreferences_site),"").equals("") && !globalVariable.getDetecting()){
                     Toast.makeText(getActivity(),"請確認工地代號後再開始偵測",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 //確認user不為空
-                if(sharedPreferences.getString(getResources().getString(R.string.sharePreferences_user),"").equals("") && !globalVariable.getIsDetecting()){
+                if(sharedPreferences.getString(getResources().getString(R.string.sharePreferences_user),"").equals("") && !globalVariable.getDetecting()){
                     Toast.makeText(getActivity(),"請確認姓名或代號後再開始偵測",Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -516,7 +711,7 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
                 final Button buttonStart = getActivity().findViewById(R.id.button_start);
 
                 //如果沒在偵測，開始偵測
-                if (!globalVariable.getIsDetecting()) {
+                if (!globalVariable.getDetecting()) {
 
                     //建立確認是否以此工地代號與姓名偵測的dialog
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -545,7 +740,7 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
                     });
                     AlertDialog dialog = builder.create();
                     dialog.setTitle("提醒");
-                    dialog.setMessage("名稱："+sharedPreferences.getString(getResources().getString(R.string.sharePreferences_user),"")+"\n工地："+sharedPreferences.getString(getResources().getString(R.string.sharePreferences_site),"")+"\n是否開始偵測？");
+                    dialog.setMessage("名稱："+sharedPreferences.getString(getResources().getString(R.string.sharePreferences_user),"")+"\n工地："+sharedPreferences.getString(getResources().getString(R.string.sharePreferences_site),"")+"\n手環："+sharedPreferences.getString("macAddress","無配對")+"\n是否開始偵測？");
                     dialog.show();
 
 
@@ -559,24 +754,47 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
 
                     Toast.makeText(this.getContext(), R.string.stop_detect, Toast.LENGTH_SHORT).show();
                 }
-                Log.d(TAG, "onClick isDetecting" + globalVariable.getIsDetecting());
+                Log.d(TAG, "onClick isDetecting" + globalVariable.getDetecting());
                 break;
 
 
             // 重置資料
             case R.id.button_reset:
+                if(globalVariable.getDetecting()) {
+                    Toast.makeText(getActivity(),"請先停止偵測",Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 //建立Alert來提醒是否要重置資料
                 AlertDialog.Builder builderReset = new AlertDialog.Builder(getActivity());
                 builderReset.setPositiveButton(R.string.alert_reset_yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // User clicked OK button
 
-                        if(globalVariable.getIsDetecting()) return;
+                        if(globalVariable.getDetecting()) return;
 
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.clear();
                         editor.apply();
+
+                        ThreadPoolExecutor threadPool = new ThreadPoolExecutor(2, 15, 1,
+                                TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(3),
+                                new ThreadPoolExecutor.DiscardOldestPolicy());
+                        threadPool.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                AppDatabase appDatabase = Room.databaseBuilder(getContext(),
+                                        AppDatabase.class, "User").build();
+
+                                UserDao userDao = appDatabase.getUserDao();
+//                List<User> list = userDao.findPortentByState(1);
+//                list.size();
+
+                                userDao.deleteAll();
+                                Log.i(TAG, "run: "+userDao.getAll().size());
+//                    new QueryAsyncTask(userDao).execute(user);
+                            }
+                        });
 
                         setAccumulationText();
 
@@ -719,7 +937,7 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
     private void checkDetectingUI() {
         GlobalVariable globalVariable = (GlobalVariable) getActivity().getApplicationContext();
         Button buttonStart = getActivity().findViewById(R.id.button_start);
-        if (globalVariable.getIsDetecting()) {
+        if (globalVariable.getDetecting()) {
             buttonStart.setText(R.string.stop_detect);
             buttonStart.setTextColor(getResources().getColor(R.color.color_stop_detect));
         }
@@ -755,14 +973,15 @@ public class BillboardFragment extends Fragment implements CompoundButton.OnChec
 
     private int[] getColors() {
 
-        int stackSize = 3;
+        int stackSize = 4;
 
         // have as many colors as stack-values per entry
         int[] colors = new int[stackSize];
 
-        colors[0] = ColorTemplate.MATERIAL_COLORS[1]; //跌倒：黃色
-        colors[1] = Color.parseColor("#ff9800"); //昏迷：橘色
-        colors[2] = ColorTemplate.MATERIAL_COLORS[2]; //墜落：紅色
+        colors[0] = Color.parseColor("#a1887f"); // 前兆：咖啡色
+        colors[1] = Color.parseColor("#ff3d00"); // 墜落：紅色
+        colors[2] = Color.parseColor("#ffea00"); // 跌倒：黃色
+        colors[3] = Color.parseColor("#ffab40"); // 昏迷：橘色
         return colors;
     }
 

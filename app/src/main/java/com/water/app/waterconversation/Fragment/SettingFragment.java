@@ -2,6 +2,7 @@ package com.water.app.waterconversation.Fragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -16,19 +17,29 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.golife.customizeclass.CareMeasureHR;
+import com.golife.customizeclass.SetCareSetting;
+import com.golife.database.table.TablePulseRecord;
+import com.golife.database.table.TableSleepRecord;
+import com.golife.database.table.TableSpO2Record;
+import com.golife.database.table.TableStepRecord;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.goyourlife.gofitsdk.GoFITSdk;
+import com.water.app.waterconversation.Activity.BluetoothDeviceListActivity;
 import com.water.app.waterconversation.GlobalVariable;
 import com.water.app.waterconversation.R;
 
-import static com.water.app.waterconversation.Activity.MainActivity.Site;
-import static com.water.app.waterconversation.Activity.MainActivity.UserId;
+import java.util.ArrayList;
+
+import static com.water.app.waterconversation.Activity.MainActivity._goFITSdk;
 import static com.water.app.waterconversation.Activity.MainActivity.sensitivityComa;
 import static com.water.app.waterconversation.Activity.MainActivity.sensitivityDrop;
 import static com.water.app.waterconversation.Activity.MainActivity.sensitivityFall;
@@ -45,6 +56,19 @@ public class SettingFragment extends Fragment implements SeekBar.OnSeekBarChange
     private DataSnapshot dataSnapshotAll;
     private boolean save = false;
     EditText editTextName, editTextSite;
+
+    private String mMacAddress = null;
+    private String mPairingCode = null;
+    private String mPairingTime = null;
+    private String mProductID = null;
+    private String mDeviceName = null;
+//    private String UserId = null;
+
+    SetCareSetting mCareSettings;
+
+
+
+    int i = 0;
 
 
 
@@ -73,7 +97,8 @@ public class SettingFragment extends Fragment implements SeekBar.OnSeekBarChange
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        int button_ids[] = {R.id.button_settingfragment_save};
+        int button_ids[] = {R.id.button_settingfragment_save, R.id.button_setting_pair_wristband, R.id.button_setting_comfirm_wristband,
+                R.id.button_setting_disconnect};
 
         int seekbar_ids[] = {R.id.seekBar_setting_drop,R.id.seekBar_setting_fall,R.id.seekBar_setting_coma,
                 R.id.seekBar_setting_lost_balance,R.id.seekBar_setting_heavy_step,R.id.seekBar_setting_suddenly_wobbing};
@@ -96,20 +121,54 @@ public class SettingFragment extends Fragment implements SeekBar.OnSeekBarChange
                 button.setOnClickListener(this);
             }
         }
+//
+//        Button button1 = getActivity().findViewById(R.id.button);
+//        button1.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                disconnectGolife();
+
+//                syncGolife();
+//                demoSettingHRTimingMeasure("on,00:00,23:59,1");
+//                if (_goFITSdk != null) {
+//                    Log.i(TAG, "demo_function_setting");
+//
+////                    Preference pPref = (Preference) findPreference("demo_function_setting");
+////                    pPref.setSummary("");
+//
+//                    if (mCareSettings == null) {
+//                        mCareSettings = _goFITSdk.getNewCareSettings();
+//                    }
+//                    String instructions = "format : [on/off], [HH:mm(startTime)], [HH:mm(endTime)], [IntervalMin]\ne.g : on,00:00,23:59,15";
+//                    displaySettingDetail(instructions, SettingItem.HR_TIMING_MEASURE);
+//                }
+//                else {
+//                    showToast("SDK Instance invalid, needs `SDK init`");
+//                }
+//            }
+
+//        });
 
         editTextName = getActivity().findViewById(R.id.editText_settingfragment_name);
         editTextSite = getActivity().findViewById(R.id.editText_settingfragment_site);
-        Button buttonSave = getActivity().findViewById(R.id.button_settingfragment_save);
 
         //取得資料庫中的userid以及site
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         editTextName.setText(sharedPreferences.getString(getResources().getString(R.string.sharePreferences_user),""));
         editTextSite.setText(sharedPreferences.getString(getResources().getString(R.string.sharePreferences_site),""));
 
+//        connectGolife();
+        setPairedIDGolife();
 
 
     }
 
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+//        handler.removeCallbacks();
+    }
 
     // seekbar變化時，進入此方法
     @Override
@@ -190,18 +249,52 @@ public class SettingFragment extends Fragment implements SeekBar.OnSeekBarChange
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+
+            // 儲存按鈕
             case R.id.button_settingfragment_save:
                 GlobalVariable globalVariable = (GlobalVariable)getActivity().getApplicationContext();
 
-                if(globalVariable.getIsDetecting()){
+                if(globalVariable.getDetecting()){
                     Toast.makeText(getActivity(),"請先暫停偵測再編輯名稱",Toast.LENGTH_SHORT).show();
                     return;
                 }
                 save = true;
                 valueEventListener.onDataChange(dataSnapshotAll);
+                break;
+
+            // 配對手環按鈕
+            case R.id.button_setting_pair_wristband:
+                    Toast.makeText(getActivity(),"bluetooth device is open.",Toast.LENGTH_SHORT).show();
+                    Intent serverIntent = new Intent(getActivity(), BluetoothDeviceListActivity.class);
+                    startActivityForResult(serverIntent, 1);
+                break;
+
+            // 尋找手環
+            case R.id.button_setting_comfirm_wristband:
+                findGolife();
+                break;
+
+            // 斷開連線
+            case R.id.button_setting_disconnect:
+                disconnectGolife();
+                break;
         }
     }
 
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        String result = data.getExtras().getString("result");//得到新Activity 关闭后返回的数据
+//        Log.i(TAG, result);
+
+//        connectGolife();
+        setPairedIDGolife();
+
+
+
+    }
+
+    // Listening from firebase to get user name and site name.
     private void setValueEventListener(){
 
         valueEventListener = new ValueEventListener() {
@@ -226,7 +319,7 @@ public class SettingFragment extends Fragment implements SeekBar.OnSeekBarChange
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putString(getResources().getString(R.string.sharePreferences_site),editTextSite.getText().toString());
                         editor.apply();
-                        Site = sharedPreferences.getString(getResources().getString(R.string.sharePreferences_site),"");
+//                        Site = sharedPreferences.getString(getResources().getString(R.string.sharePreferences_site),"");
                         foundSite = true;
                         Toast.makeText(getActivity(),"已儲存工地",Toast.LENGTH_SHORT).show();
                     }
@@ -248,7 +341,7 @@ public class SettingFragment extends Fragment implements SeekBar.OnSeekBarChange
                         editor.putString(getResources().getString(R.string.sharePreferences_user), editTextName.getText().toString());
 //                                editor.putString("site",editTextSite.getText().toString());
                         editor.apply();
-                        UserId = sharedPreferences.getString(getResources().getString(R.string.sharePreferences_user),"");
+//                        UserId = sharedPreferences.getString(getResources().getString(R.string.sharePreferences_user),"");
 //                                Site = sharedPref.getString("site","");
                         foundName = true;
                         Toast.makeText(getActivity(),"已儲存名稱",Toast.LENGTH_SHORT).show();
@@ -266,8 +359,8 @@ public class SettingFragment extends Fragment implements SeekBar.OnSeekBarChange
                             editor.putString(getResources().getString(R.string.sharePreferences_user), editTextName.getText().toString());
                             editor.putString(getResources().getString(R.string.sharePreferences_site),editTextSite.getText().toString());
                             editor.apply();
-                            UserId = sharedPref.getString(getResources().getString(R.string.sharePreferences_user),"");
-                            Site = sharedPref.getString(getResources().getString(R.string.sharePreferences_site),"");
+                            String UserId = sharedPref.getString(getResources().getString(R.string.sharePreferences_user),"");
+//                            Site = sharedPref.getString(getResources().getString(R.string.sharePreferences_site),"");
 
                             Log.d(TAG, "已註冊新名稱"+UserId);
                         }
@@ -294,5 +387,377 @@ public class SettingFragment extends Fragment implements SeekBar.OnSeekBarChange
             }
         };
         userDataBase.addValueEventListener(valueEventListener);
+    }
+
+    // 設定配對狀態的文字
+    private void setPairedIDGolife(){
+        TextView textView = getActivity().findViewById(R.id.textview_setting_wristband_connect_state);
+        if (_goFITSdk != null) {
+            Log.i(TAG, "demo_function_connect");
+
+            // Demo - get connect information from local storage
+            if (mMacAddress == null || mPairingCode == null || mPairingTime == null) {
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences.Editor pe = sp.edit();
+                mMacAddress = sp.getString("macAddress", "");
+                mPairingCode = sp.getString("pairCode", "");
+                mPairingTime = sp.getString("pairTime", "");
+                mProductID = sp.getString("productID", "");
+                mDeviceName = sp.getString("deviceName","");
+                pe.apply();
+            }
+            try{
+                textView.setText(getResources().getString(R.string.setting_already_paired)+mDeviceName+"\n"+mMacAddress);
+            }catch (Exception e){
+                Log.e(TAG, e.toString());
+            }
+        }else{
+            textView.setText(getResources().getString(R.string.setting_no_paired));
+        }
+    }
+
+    private void findGolife(){
+        if (_goFITSdk != null) {
+            Log.i(TAG, "demo_function_connect");
+
+            // Demo - get connect information from local storage
+            if (mMacAddress == null || mPairingCode == null || mPairingTime == null) {
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences.Editor pe = sp.edit();
+                mMacAddress = sp.getString("macAddress", "");
+                mPairingCode = sp.getString("pairCode", "");
+                mPairingTime = sp.getString("pairTime", "");
+                mProductID = sp.getString("productID", "");
+                pe.apply();
+            }
+
+            showToast("正在尋找手環...");
+
+            // Demo - doConnectDevice API
+            _goFITSdk.doConnectDevice(mMacAddress, mPairingCode, mPairingTime, mProductID, new GoFITSdk.GenericCallback() {
+                @Override
+                public void onSuccess() {
+                    Log.i(TAG, "doConnectDevice() : onSuccess()");
+                    showToast("連線成功 ");
+
+//                    Preference pPref = (Preference) findPreference("demo_connect_status");
+                    // Demo - isBLEConnect API
+                    boolean isConnect = _goFITSdk.isBLEConnect();
+                    String summary = isConnect ? "已連接：" : "未連接：";
+//                    pPref.setSummary(summary);
+//
+//                    pPref = (Preference) findPreference("demo_function_connect");
+//                    pPref.setSummary("Connected : " + mMacAddress);
+                    try{
+                        TextView textView = getActivity().findViewById(R.id.textview_setting_wristband_connect_state);
+                        textView.setText(summary+mMacAddress);
+                    }catch (Exception e){
+                        Log.e(TAG, e.toString());
+                    }
+
+
+                    Log.i(TAG, "demo_function_find_my_care");
+
+                    // Demo - doFindMyCare API
+                    _goFITSdk.doFindMyCare(3);
+
+                    // Demo - setRemoteCameraHandler API
+//                    demoSetRemoteCameraHandler();
+                }
+
+                @Override
+                public void onFailure(int errorCode, String errorMsg) {
+                    Log.e(TAG, "doConnectDevice() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+                    showToast("doConnectDevice() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+                }
+            });
+        }
+        else {
+            showToast("SDK Instance invalid, needs `SDK init`");
+        }
+    }
+
+    // 連線Golife 手環
+    void connectGolife(){
+        if (_goFITSdk != null) {
+            Log.i(TAG, "demo_function_connect");
+
+            // Demo - get connect information from local storage
+            if (mMacAddress == null || mPairingCode == null || mPairingTime == null) {
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences.Editor pe = sp.edit();
+                mMacAddress = sp.getString("macAddress", "");
+                mPairingCode = sp.getString("pairCode", "");
+                mPairingTime = sp.getString("pairTime", "");
+                mProductID = sp.getString("productID", "");
+                pe.apply();
+            }
+
+            // Demo - doConnectDevice API
+            _goFITSdk.doConnectDevice(mMacAddress, mPairingCode, mPairingTime, mProductID, new GoFITSdk.GenericCallback() {
+                @Override
+                public void onSuccess() {
+                    Log.i(TAG, "doConnectDevice() : onSuccess()");
+                    showToast("Connect complete");
+
+//                    Preference pPref = (Preference) findPreference("demo_connect_status");
+                    // Demo - isBLEConnect API
+                    boolean isConnect = _goFITSdk.isBLEConnect();
+                    String summary = isConnect ? "已連接：" : "未連接：";
+//                    pPref.setSummary(summary);
+//
+//                    pPref = (Preference) findPreference("demo_function_connect");
+//                    pPref.setSummary("Connected : " + mMacAddress);
+                    try{
+                        TextView textView = getActivity().findViewById(R.id.textview_setting_wristband_connect_state);
+                        textView.setText(summary+mMacAddress);
+                    }catch (Exception e){
+                        Log.e(TAG, e.toString());
+                    }
+
+
+                    demoSettingHRTimingMeasure("on,00:00,23:59,1");
+                    syncGolife();
+
+                    // Demo - setRemoteCameraHandler API
+//                    demoSetRemoteCameraHandler();
+                }
+
+                @Override
+                public void onFailure(int errorCode, String errorMsg) {
+                    Log.e(TAG, "doConnectDevice() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+                    showToast("doConnectDevice() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+                }
+            });
+        }
+        else {
+            showToast("SDK Instance invalid, needs `SDK init`");
+        }
+    }
+
+    // 與Golife 手環同步
+    private void syncGolife(){
+        if (_goFITSdk != null) {
+            Log.i(TAG, "demo_function_sync");
+
+            // Demo - doSyncFitnessData API
+            _goFITSdk.doSyncFitnessData(new GoFITSdk.SyncCallback() {
+                @Override
+                public void onCompletion() {
+                    Log.i(TAG, "doSyncFitnessData() : onCompletion()");
+                    showToast("Sync complete!\nDetail fitness data show in `Logcat`");
+                }
+
+                @Override
+                public void onProgress(String message, int progress) {
+//                    Log.i(TAG, "doSyncFitnessData() : onProgress() : message = " + message + ", progress = " + progress);
+//                    Preference pPref = (Preference) findPreference("demo_function_sync");
+//                    String summary = String.format("%d", progress);
+//                    pPref.setSummary(summary);
+                }
+
+                @Override
+                public void onFailure(int errorCode, String errorMsg) {
+                    Log.e(TAG, "doSyncFitnessData() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+//                    showToast("doSyncFitnessData() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+                }
+
+                @Override
+                public void onGetFitnessData(ArrayList<TableStepRecord> stepRecords, ArrayList<TableSleepRecord> sleepRecords, ArrayList<TablePulseRecord> hrRecords, ArrayList<TableSpO2Record> spo2Records) {
+//                    for (TableStepRecord step : stepRecords) {
+//                        Log.i(TAG, "doSyncFitnessData() : onGetFitnessData() : step = " + step.toJSONString());
+//                    }
+//
+//                    for (TableSleepRecord sleep : sleepRecords) {
+//                        Log.i(TAG, "doSyncFitnessData() : onGetFitnessData() : sleep = " + sleep.toJSONString());
+//                    }
+
+
+                    TablePulseRecord tablePulseRecord= hrRecords.get(hrRecords.size()-1);
+                    Log.d(TAG, "last data:  "+tablePulseRecord.getPulse());
+
+//                    for (TablePulseRecord hr : hrRecords) {
+//                        Log.i(TAG, "doSyncFitnessData() : onGetFitnessData() : hr = " + hr.toJSONString());
+//                        Log.d(TAG, "HR: "+hr.getPulse()+", time: "+hr.getTimestamp());
+//                    }
+
+//                    for (TableSpO2Record spo2 : spo2Records) {
+//                        Log.i(TAG, "doSyncFitnessData() : onGetFitnessData() : spo2 = " + spo2.toJSONString());
+//                    }
+                }
+            });
+        }
+        else {
+            showToast("SDK Instance invalid, needs `SDK init`");
+        }
+    }
+
+    //與Golife手環段開連線
+    private void disconnectGolife(){
+
+        GlobalVariable globalVariable  = (GlobalVariable) getActivity().getApplicationContext();
+
+
+        if(globalVariable.getDetecting()){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setPositiveButton(R.string.alert_reset_yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    if (_goFITSdk != null) {
+
+                        try{
+                            _goFITSdk.doDisconnectDevice();
+                            Log.i(TAG, "demo_function_disconnect");
+                            showToast("斷開連線");
+                            TextView textView = getActivity().findViewById(R.id.textview_setting_wristband_connect_state);
+                            textView.setText("已斷開連線："+mMacAddress);
+                        }catch (Exception e){
+                            Log.e(TAG, e.toString());
+                        }
+
+                    }
+                    else {
+                        showToast("SDK Instance invalid, needs `SDK init`");
+                    }
+                }
+            });
+            builder.setNegativeButton(R.string.alert_reset_no, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.setTitle("裝置偵測中，確定要中斷與手環的連線?");
+            dialog.show();
+        }
+        else {
+            if (_goFITSdk != null) {
+
+                try {
+                    _goFITSdk.doDisconnectDevice();
+                    Log.i(TAG, "demo_function_disconnect");
+                    showToast("斷開連線");
+                    TextView textView = getActivity().findViewById(R.id.textview_setting_wristband_connect_state);
+                    textView.setText("已斷開連線：" + mMacAddress);
+                } catch (Exception e) {
+                    Log.e(TAG, e.toString());
+                }
+
+            } else {
+                showToast("SDK Instance invalid, needs `SDK init`");
+            }
+        }
+    }
+
+    // 設定心率頻率("開關，開始時間，結束時間，取樣頻率"，ex:"on,00:00,23:59,1")
+    void demoSettingHRTimingMeasure(String userInput) {
+        if (mCareSettings == null) {
+            mCareSettings = _goFITSdk.getNewCareSettings();
+        }
+        String[] separated = userInput.split(",");
+        if (separated.length == 4) {
+            // Demo - HR timing measure setting
+            CareMeasureHR careMeasureHR = mCareSettings.getDefaultMeasureHR();
+            careMeasureHR.setRepeatDays(convertRepeatDay(127));
+            if (separated[0].equals("on") || separated[0].equals("off")) {
+                boolean enable = separated[0].equals("on") ? true : false;
+                careMeasureHR.setEnableMeasureHR(enable);
+            }
+            else {
+                showToast("Error Format (invalid input : must be `on` or `off`)");
+                return;
+            }
+
+            int startMin = convertHHmmToMin(separated[1]);
+            if (startMin >= 0 && startMin <= 1439) {
+                careMeasureHR.setStartMin((short) startMin);
+            }
+            else {
+                showToast("Error Format (invalid time format)");
+            }
+
+            int endMin = convertHHmmToMin(separated[2]);
+            if (endMin >= 0 && endMin <= 1439) {
+                careMeasureHR.setEndMin((short) endMin);
+            }
+            else {
+                showToast("Error Format (invalid time format)");
+            }
+
+            try {
+                int intervalMin = Integer.valueOf(separated[3]);
+                careMeasureHR.setInterval((short)intervalMin);
+            }
+            catch (NumberFormatException e) {
+                showToast("Error Format (not number format)");
+                return;
+            }
+
+            mCareSettings.setMeasureHR(careMeasureHR);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid parameter counts)");
+        }
+    }
+
+    byte[] convertRepeatDay(int days) {
+        byte[] repeatDays = {0, 0, 0, 0, 0, 0, 0};
+        try {
+            repeatDays[0] = (byte) (((days & 0x01) == 1) ? 1 : 0);
+            repeatDays[1] = (byte) ((((days >> 1) & 0x01) == 1) ? 1 : 0);
+            repeatDays[2] = (byte) ((((days >> 2) & 0x01) == 1) ? 1 : 0);
+            repeatDays[3] = (byte) ((((days >> 3) & 0x01) == 1) ? 1 : 0);
+            repeatDays[4] = (byte) ((((days >> 4) & 0x01) == 1) ? 1 : 0);
+            repeatDays[5] = (byte) ((((days >> 5) & 0x01) == 1) ? 1 : 0);
+            repeatDays[6] = (byte) ((((days >> 6) & 0x01) == 1) ? 1 : 0);
+        } catch (Exception e) {
+            for (int i = 0; i < repeatDays.length; i++) {
+                repeatDays[i] = 0;
+            }
+        }
+
+        return repeatDays;
+    }
+
+    int convertHHmmToMin(String HHmm) {
+        try {
+            String[] timestamp = HHmm.split(":");
+            int hour = Integer.parseInt(timestamp[0]);
+            int minute = Integer.parseInt(timestamp[1]);
+            return (hour * 60 + minute);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    void demoSetSettingToDevice() {
+        // Demo - doSetSetting API
+        _goFITSdk.doSetSettings(mCareSettings, new GoFITSdk.SettingsCallback() {
+            @Override
+            public void onCompletion() {
+                Log.i(TAG, "doSetSettings() : onCompletion()");
+                showToast("Setting OK");
+//                Preference pPref = (Preference) findPreference("demo_function_setting");
+//                String summary = "Setting OK";
+//                pPref.setSummary(summary);
+            }
+
+            @Override
+            public void onProgress(String message) {
+                Log.i(TAG, "doSetSettings() : onProgress() : message = " + message);
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg) {
+                Log.e(TAG, "doSetSettings() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+                showToast("doSetSettings() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+            }
+        });
+
+    }
+
+    void showToast(String text) {
+        Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
     }
 }

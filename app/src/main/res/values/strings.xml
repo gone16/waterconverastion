@@ -9,7 +9,7 @@
     <string name="title_billboard">看板</string>
     <string name="title_location">位置</string>
     <string name="title_setting">設定</string>
-    <string name="title_parameter">參數</string>
+    <string name="title_parameter">系統參數</string>
 
     <!--login UI-->
     <string name="textview_login_title">登入</string>
@@ -50,6 +50,8 @@
     <string name="text_accumulation_portent"></string>
 
     <!--setting UI-->
+    <string name="text_setting_name">姓名或代號</string>
+    <string name="text_setting_site">工地代號</string>
     <string name="text_setting_sensitivity">敏感度</string>
     <string name="text_setting_sensitivity_drop">墜落</string>
     <string name="text_setting_sensitivity_fall">跌倒</string>
@@ -57,7 +59,16 @@
     <string name="text_setting_sensitivity_lost_balance">不穩</string>
     <string name="text_setting_sensitivity_heavy_step">重踩</string>
     <string name="text_setting_sensitivity_suddenly_wobbing">搖晃</string>
+    <string name="text_setting_connect_state">狀態：未連接</string>
+    <string name="button_setting_save">儲存</string>
+    <string name="button_setting_pair_wristband">配對手環</string>
+    <string name="button_setting_comfirm_wristband">確認手環</string>
+    <string name="button_setting_disconnect">斷開連線</string>
+    <string name="text_version">版本 1.2.1</string>
 
+    <!--setting string-->
+    <string name="setting_already_paired">已配對：</string>
+    <string name="setting_no_paired">尚未配對手環</string>
 
 
     <!--billboard string-->

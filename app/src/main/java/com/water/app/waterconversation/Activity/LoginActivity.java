@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
         GlobalVariable globalVariable = (GlobalVariable) getApplicationContext();
 
         if(globalVariable!=null) {
-            if( globalVariable.getIsDetecting()) {
+            if( globalVariable.getDetecting()) {
                 Intent intentLogin = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intentLogin);
             }

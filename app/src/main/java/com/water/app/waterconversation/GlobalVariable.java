@@ -126,8 +126,6 @@ public class GlobalVariable extends Application {
         return Open_location;
     }
 
-    //顯示是否偵測中
-    public Boolean getIsDetecting(){return  Detecting;}
 
     //得知是否警報中
     public Boolean getAlarming() {

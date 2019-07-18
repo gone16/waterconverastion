@@ -9,6 +9,17 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
 
     <application
         android:name="com.water.app.waterconversation.GlobalVariable"
@@ -18,6 +29,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDh_OeTdR-5S4MCyemRKeBdkLN42dVLoKQ" />
+
         <activity android:name="com.water.app.waterconversation.Activity.MainActivity"
             android:screenOrientation="portrait"
             >
@@ -39,9 +58,15 @@
 
         <service
             android:name="com.water.app.waterconversation.Service.ForeService" />
+        <service
+            android:name="com.golife.service.SyncService"
+            android:enabled="true" />
+
         <activity android:name="com.water.app.waterconversation.AlarmReceiver"
             android:screenOrientation="portrait"/>
         <activity android:name="com.water.app.waterconversation.PortentAlarmReceiver"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Activity.BluetoothDeviceListActivity"
             android:screenOrientation="portrait"/>
     </application>
 

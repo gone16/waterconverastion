@@ -8,6 +8,7 @@ import android.app.Service;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -21,6 +22,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -28,6 +30,12 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.golife.customizeclass.CareMeasureHR;
+import com.golife.customizeclass.SetCareSetting;
+import com.golife.database.table.TablePulseRecord;
+import com.golife.database.table.TableSleepRecord;
+import com.golife.database.table.TableSpO2Record;
+import com.golife.database.table.TableStepRecord;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -35,6 +43,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.goyourlife.gofitsdk.GoFITSdk;
 import com.water.app.waterconversation.Activity.MainActivity;
 import com.water.app.waterconversation.AlarmReceiver;
 import com.water.app.waterconversation.CSVDataBean;
@@ -69,8 +78,7 @@ import java.util.concurrent.TimeUnit;
 import static com.water.app.waterconversation.Activity.MainActivity.DeviceId;
 import static com.water.app.waterconversation.Activity.MainActivity.OpenAccidentAlarm;
 import static com.water.app.waterconversation.Activity.MainActivity.OpenPortentAlarm;
-import static com.water.app.waterconversation.Activity.MainActivity.Site;
-import static com.water.app.waterconversation.Activity.MainActivity.UserId;
+import static com.water.app.waterconversation.Activity.MainActivity._goFITSdk;
 import static com.water.app.waterconversation.Activity.MainActivity.sensitivityComa;
 import static com.water.app.waterconversation.Activity.MainActivity.sensitivityDrop;
 import static com.water.app.waterconversation.Activity.MainActivity.sensitivityFall;
@@ -101,7 +109,7 @@ public class ForeService extends Service implements SensorEventListener , Google
     //設定間隔時間
     long LastUpdateTime;
     long LastUploadTime;
-    private final int Update_Interval_Time = 90;
+    private final int Update_Interval_Time = 100;
     private final int Upload_Interval_Time = 60000;
 
     //給x,y,z初值
@@ -121,9 +129,10 @@ public class ForeService extends Service implements SensorEventListener , Google
     private int count_portent = 0;
     private int count_accident = 0;
     private int count_upload_coma = 0;
+    private long last_upload_time;
     private int csvtime = 600*30;
     private int firebaseListChanger =0;
-    private int firebasetime = 500;
+    private final int firebasetime = 600;
 
     private int drop_count, fall_count = 0;
 
@@ -131,8 +140,17 @@ public class ForeService extends Service implements SensorEventListener , Google
 
     private DatabaseReference mDatabase;
 
-    private float heartRate = 0.0f;
+    private int heartRate = 0;
 
+    private String UserId;
+    private String Site;
+
+    // Variable for Golife wrist
+    private String mMacAddress = null;
+    private String mPairingCode = null;
+    private String mPairingTime = null;
+    private String mProductID = null;
+    SetCareSetting mCareSettings;
 //    private String UserId = "";
 //    private String DeviceId;
 //    private String Site = "";
@@ -189,6 +207,11 @@ public class ForeService extends Service implements SensorEventListener , Google
                 addConnectionCallbacks(this).
                 addOnConnectionFailedListener(this).build();
         mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        UserId = sharedPreferences.getString(getResources().getString(R.string.sharePreferences_user),"");
+        Site = sharedPreferences.getString(getResources().getString(R.string.sharePreferences_site),"");
 //        DeviceId = android.os.Build.SERIAL;
     }
 
@@ -225,6 +248,10 @@ public class ForeService extends Service implements SensorEventListener , Google
             // 前景服務運行中，更改狀態為 isDetecting
             GlobalVariable globalVariable = (GlobalVariable)getApplicationContext();
             globalVariable.setDetecting(true);
+
+            // 連接Golife手環
+            connectGolife();
+
 
 //            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 //            SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -337,18 +364,22 @@ public class ForeService extends Service implements SensorEventListener , Google
             writeCsv(csvDataBeanArrayList2);
         }
 
-        if(firebaseListChanger ==0){
-            for(int i=0; i<firebaseArrayList.size(); i++){
-                String user_date_time = firebaseArrayList.get(i).date+"_"+firebaseArrayList.get(i).time+"_"+firebaseArrayList.get(i).id;
-                mDatabase.child(Site).child(user_date_time).setValue(firebaseArrayList.get(i));
+        try {
+            if (firebaseListChanger == 0) {
+                for (int i = 0; i < firebaseArrayList.size(); i++) {
+                    String user_date_time = firebaseArrayList.get(i).date + "_" + firebaseArrayList.get(i).time + "_" + firebaseArrayList.get(i).id;
+                    mDatabase.child(Site).child(user_date_time).setValue(firebaseArrayList.get(i));
 //                mDatabase.child("dailyData").child(id).child(time).setValue(user);
-            }
-        }else{
-            for(int i=0; i<firebaseArrayList2.size(); i++){
-                String user_date_time = firebaseArrayList2.get(i).date+"_"+firebaseArrayList2.get(i).time+"_"+firebaseArrayList.get(i).id;
-                mDatabase.child(Site).child(user_date_time).setValue(firebaseArrayList2.get(i));
+                }
+            } else {
+                for (int i = 0; i < firebaseArrayList2.size(); i++) {
+                    String user_date_time = firebaseArrayList2.get(i).date + "_" + firebaseArrayList2.get(i).time + "_" + firebaseArrayList.get(i).id;
+                    mDatabase.child(Site).child(user_date_time).setValue(firebaseArrayList2.get(i));
 //                mDatabase.child("dailyData").child(id).child(time).setValue(user);
+                }
             }
+        }catch (Exception e){
+            Log.e(TAG, "onDestroy: ",e );
         }
 
         Log.d(TAG, "onDestroy: destroy handler");
@@ -382,7 +413,7 @@ public class ForeService extends Service implements SensorEventListener , Google
     @Override
     public void onSensorChanged(SensorEvent event) {
         GlobalVariable globalVariable = (GlobalVariable)getApplicationContext();
-        if(!globalVariable.getIsDetecting()) return;
+        if(!globalVariable.getDetecting()) return;
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             long CurrentUpdateTime = System.currentTimeMillis();
             long TimeInterval = CurrentUpdateTime - LastUpdateTime;
@@ -698,6 +729,9 @@ public class ForeService extends Service implements SensorEventListener , Google
 
             //有可能偵測結果為安全，但是其實是User還沒回覆
             case "normal":
+                if(count_upload>firebasetime){
+
+
                 if(globalVariable.getOK()){
                     saveDataState(Constants.ACCIDENTS.NORMAL,Constants.ACCIDENTS.NORMAL,Constants.PORTENTS.NORMAL,Constants.PORTENTS.NORMAL);
                 }else if(globalVariable.getAlarmPortentAnswer() !=0 || globalVariable.getAlarmAccidentAnswer() !=0){
@@ -710,6 +744,7 @@ public class ForeService extends Service implements SensorEventListener , Google
                     if(count_upload > firebasetime){
                         saveDataState(Constants.ACCIDENTS.NORMAL,globalVariable.getAlarmAccidentAnswer(),Constants.PORTENTS.NORMAL,globalVariable.getAlarmPortentAnswer());
                     }
+                }
                 }
                 break;
 
@@ -878,12 +913,13 @@ public class ForeService extends Service implements SensorEventListener , Google
 
     //決定關鍵數據(accident, accidentAns, portent, portentAns)
     private void saveDataState(int accident, int accidentAns, int portent, int portentAns){
+        if(Site.equals(null) || UserId.equals(null) ) return;
         saveCsv(UserId,DeviceId,getCurrentDate(),getCurrentTime(),latitude,longitude,x,y,z,accident,accidentAns,portent,portentAns,Site,altitude,heartRate);
         saveFireBase(UserId,DeviceId,getCurrentDate(),getCurrentTime(),latitude,longitude,x,y,z,accident,accidentAns,portent,portentAns,Site,altitude,heartRate);
     }
 
     //將csvList存入.csv檔
-    private void saveCsv(String id, String idDevice, String date, String time, float latitude, float longitude, float accX, float accY, float accZ, int accident, int accidentAns, int portent, int portentAns, String site, float altitude,float heartRate){
+    private void saveCsv(String id, String idDevice, String date, String time, float latitude, float longitude, float accX, float accY, float accZ, int accident, int accidentAns, int portent, int portentAns, String site, float altitude,int heartRate){
         CSVDataBean apacheBean = new CSVDataBean();
         apacheBean.setId(id);
         apacheBean.setIdDevice(idDevice);
@@ -967,14 +1003,18 @@ public class ForeService extends Service implements SensorEventListener , Google
         }
     }
 
-    private void saveFireBase(String id, String idDevice, String date, String time, float latitude, float longitude, float accX, float accY, float accZ, int accident, int accidentAns, int portent, int portentAns, String site, float altitude, float heartRate){
+    private void saveFireBase(String id, String idDevice, String date, String time, float latitude, float longitude, float accX, float accY, float accZ, int accident, int accidentAns, int portent, int portentAns, String site, float altitude, int heartRate){
         UploadData uploadData = new UploadData(id,idDevice,date,time,latitude,longitude,accX,accY,accZ,accident,accidentAns,portent,portentAns,site,altitude,heartRate);
 
-        Log.d(TAG, "upload: "+count_upload + ", portent"+count_portent + ", accident" + count_accident);
+
+        Log.d(TAG, "upload: "+count_upload + ", portent"+count_portent + ", accident" + count_accident );
 
 
+
+        boolean accidenting = false;
 
         if(count_accident>0){
+            accidenting = true;
             if(firebaseListChanger ==0){
                 firebaseListChanger = 1;
                 count_portent =0;
@@ -982,66 +1022,92 @@ public class ForeService extends Service implements SensorEventListener , Google
                 count_accident =0;
                 firebaseArrayList.add(uploadData);
                 for(int i=0; i<firebaseArrayList.size(); i++){
+                    if(i==firebaseArrayList.size()-1){
+                        if(firebaseArrayList.get(i).portent >0){
+                            firebaseArrayList2.add(uploadData);
+                            break;
+                        }
+                    }
                     String user_date_time = firebaseArrayList.get(i).date+"_"+firebaseArrayList.get(i).time+"_"+firebaseArrayList.get(i).id;
                     mDatabase.child(Site).child(user_date_time).setValue(firebaseArrayList.get(i));
+
                     //                mDatabase.child("dailyData").child(id).child(time).setValue(user);
                 }
-                Log.d(TAG, "saveFireBase: "+firebaseArrayList.get(firebaseArrayList.size()-1).accident);
+                Log.d(TAG, "saveFireBase1: "+firebaseArrayList.get(firebaseArrayList.size()-1).accident);
                 firebaseArrayList.clear();
+                accidenting = false;
             }
 
-            if(firebaseListChanger ==1){
+            else{
                 firebaseListChanger = 0;
                 count_portent =0;
                 count_upload = 0;
                 count_accident = 0;
                 firebaseArrayList2.add(uploadData);
                 for(int i=0; i<firebaseArrayList2.size(); i++){
+                    if(i==firebaseArrayList2.size()-1){
+                        if(firebaseArrayList2.get(i).portent >0){
+                            firebaseArrayList.add(uploadData);
+                            break;
+                        }
+                    }
                     String user_date_time = firebaseArrayList2.get(i).date+"_"+firebaseArrayList2.get(i).time+"_"+firebaseArrayList2.get(i).id;
                     mDatabase.child(Site).child(user_date_time).setValue(firebaseArrayList2.get(i));
                     //                mDatabase.child("dailyData").child(id).child(time).setValue(user);
                 }
-                Log.d(TAG, "saveFireBase: "+firebaseArrayList);
+                Log.d(TAG, "saveFireBase2: "+firebaseArrayList);
                 firebaseArrayList2.clear();
+                accidenting = false;
             }
         }
 
-        else if(count_portent>0){
+        else if(count_portent>0 && count_accident==0){
             if(firebaseListChanger ==0){
+                Log.d(TAG, "save portent");
                 firebaseArrayList.add(uploadData);
             }
 
-            if(firebaseListChanger ==1){
+            else{
+                Log.d(TAG, "save portent2");
                 firebaseArrayList2.add(uploadData);
             }
         }
+//        else {
+//            long CurrentUpdateTime = System.currentTimeMillis();
+//            long TimeInterval = CurrentUpdateTime - last_upload_time;
+//            Log.e(TAG, "saveFireBase  time: " + TimeInterval);
+//            if (TimeInterval < firebasetime) return;
+//            last_upload_time = CurrentUpdateTime;
 
-        else if(count_upload > firebasetime){
-            if(firebaseListChanger ==0){
-
-                if(count_portent ==0)firebaseArrayList.add(uploadData);
+        if(count_upload > firebasetime && count_accident==0){
+            Log.d(TAG, "saveFireBase!!!" + firebasetime);
+            if (firebaseListChanger == 0) {
+//                syncGolife();
+                Log.d(TAG, "saveFireBase1: " + count_upload);
+                if (count_portent == 0) firebaseArrayList.add(uploadData);
 
                 firebaseListChanger = 1;
-                count_portent =0;
+                count_portent = 0;
                 count_upload = 0;
-                for(int i=0; i<firebaseArrayList.size(); i++){
-                    String user_date_time = firebaseArrayList.get(i).date+"_"+firebaseArrayList.get(i).time+"_"+firebaseArrayList.get(i).id;
+                for (int i = 0; i < firebaseArrayList.size(); i++) {
+                    String user_date_time = firebaseArrayList.get(i).date + "_" + firebaseArrayList.get(i).time + "_" + firebaseArrayList.get(i).id;
                     mDatabase.child(Site).child(user_date_time).setValue(firebaseArrayList.get(i));
                     //                mDatabase.child("dailyData").child(id).child(time).setValue(user);
                 }
                 firebaseArrayList.clear();
             }
 
-            if(firebaseListChanger ==1){
-
-                if(count_portent ==0)firebaseArrayList2.add(uploadData);
+            else{
+//                syncGolife();
+                Log.d(TAG, "saveFireBase2: " + count_upload);
+                if (count_portent == 0) firebaseArrayList2.add(uploadData);
 
                 firebaseListChanger = 0;
-                count_portent =0;
+                count_portent = 0;
                 count_upload = 0;
 
-                for(int i=0; i<firebaseArrayList2.size(); i++){
-                    String user_date_time = firebaseArrayList2.get(i).date+"_"+firebaseArrayList2.get(i).time+"_"+firebaseArrayList2.get(i).id;
+                for (int i = 0; i < firebaseArrayList2.size(); i++) {
+                    String user_date_time = firebaseArrayList2.get(i).date + "_" + firebaseArrayList2.get(i).time + "_" + firebaseArrayList2.get(i).id;
                     mDatabase.child(Site).child(user_date_time).setValue(firebaseArrayList2.get(i));
                     //                mDatabase.child("dailyData").child(id).child(time).setValue(user);
                 }
@@ -1049,6 +1115,7 @@ public class ForeService extends Service implements SensorEventListener , Google
                 firebaseArrayList2.clear();
             }
         }
+//        }
 
 
 
@@ -1146,13 +1213,16 @@ public class ForeService extends Service implements SensorEventListener , Google
 
     public String getCurrentTime(){
         Calendar mCal = Calendar.getInstance();
-        String dataFormat = "kk:mm:ss:SSS";
+        String dataFormat = "HH:mm:ss:SSS";
         String[] hour =  dataFormat.split(":");
-        if(hour[0] == "24"){
-            dataFormat = "00"+":"+hour[1]+":"+hour[2]+":"+hour[3];
-        }
+
+//        if(hour[0] == "24"){
+//            dataFormat = "00"+":"+hour[1]+":"+hour[2]+":"+hour[3];
+//        }
         SimpleDateFormat df = new SimpleDateFormat(dataFormat);
+
         String time = df.format(mCal.getTime());
+//        Log.e(TAG, "getCurrentTime: "+ time);
 
         return time;
     }
@@ -1256,6 +1326,227 @@ public class ForeService extends Service implements SensorEventListener , Google
         }
     }
 
+    void connectGolife(){
+        if (_goFITSdk != null) {
+            Log.i(TAG, "demo_function_connect");
 
+            // Demo - get connect information from local storage
+            if (mMacAddress == null || mPairingCode == null || mPairingTime == null) {
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor pe = sp.edit();
+                mMacAddress = sp.getString("macAddress", "");
+                mPairingCode = sp.getString("pairCode", "");
+                mPairingTime = sp.getString("pairTime", "");
+                mProductID = sp.getString("productID", "");
+                pe.apply();
+            }
+
+            // Demo - doConnectDevice API
+            _goFITSdk.doConnectDevice(mMacAddress, mPairingCode, mPairingTime, mProductID, new GoFITSdk.GenericCallback() {
+                @Override
+                public void onSuccess() {
+                    Log.i(TAG, "doConnectDevice() : onSuccess()");
+                    showToast("Connect complete");
+
+//                    Preference pPref = (Preference) findPreference("demo_connect_status");
+                    // Demo - isBLEConnect API
+                    boolean isConnect = _goFITSdk.isBLEConnect();
+                    String summary = isConnect ? "已連接：" : "未連接：";
+                    demoSettingHRTimingMeasure("on,00:00,23:59,1");
+                    _goFITSdk.doFindMyCare(3);
+                    syncGolife();
+                }
+
+                @Override
+                public void onFailure(int errorCode, String errorMsg) {
+                    Log.e(TAG, "doConnectDevice() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+                    showToast("doConnectDevice() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+                }
+            });
+        }
+        else {
+            showToast("SDK Instance invalid, needs `SDK init`");
+        }
+    }
+
+    private void syncGolife(){
+        if (_goFITSdk != null) {
+            Log.i(TAG, "demo_function_sync");
+
+            // Demo - doSyncFitnessData API
+            _goFITSdk.doSyncFitnessData(new GoFITSdk.SyncCallback() {
+                @Override
+                public void onCompletion() {
+                    Log.i(TAG, "doSyncFitnessData() : onCompletion()");
+                    showToast("Sync complete!\nDetail fitness data show in `Logcat`");
+                }
+
+                @Override
+                public void onProgress(String message, int progress) {
+//                    Log.i(TAG, "doSyncFitnessData() : onProgress() : message = " + message + ", progress = " + progress);
+//                    Preference pPref = (Preference) findPreference("demo_function_sync");
+//                    String summary = String.format("%d", progress);
+//                    pPref.setSummary(summary);
+                }
+
+                @Override
+                public void onFailure(int errorCode, String errorMsg) {
+                    Log.e(TAG, "doSyncFitnessData() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+//                    showToast("doSyncFitnessData() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+                }
+
+                @Override
+                public void onGetFitnessData(ArrayList<TableStepRecord> stepRecords, ArrayList<TableSleepRecord> sleepRecords, ArrayList<TablePulseRecord> hrRecords, ArrayList<TableSpO2Record> spo2Records) {
+//                    for (TableStepRecord step : stepRecords) {
+//                        Log.i(TAG, "doSyncFitnessData() : onGetFitnessData() : step = " + step.toJSONString());
+//                    }
+//
+//                    for (TableSleepRecord sleep : sleepRecords) {
+//                        Log.i(TAG, "doSyncFitnessData() : onGetFitnessData() : sleep = " + sleep.toJSONString());
+//                    }
+
+
+                    TablePulseRecord tablePulseRecord= hrRecords.get(hrRecords.size()-1);
+                    heartRate = tablePulseRecord.getPulse();
+                    Log.d(TAG, "last data:  "+tablePulseRecord.getPulse());
+
+//                    for (TablePulseRecord hr : hrRecords) {
+//                        Log.i(TAG, "doSyncFitnessData() : onGetFitnessData() : hr = " + hr.toJSONString());
+//                        Log.d(TAG, "HR: "+hr.getPulse()+", time: "+hr.getTimestamp());
+//                    }
+
+//                    for (TableSpO2Record spo2 : spo2Records) {
+//                        Log.i(TAG, "doSyncFitnessData() : onGetFitnessData() : spo2 = " + spo2.toJSONString());
+//                    }
+                }
+            });
+        }
+        else {
+            showToast("SDK Instance invalid, needs `SDK init`");
+        }
+    }
+
+    private void disconnectGolife(){
+        if (_goFITSdk != null) {
+            Log.i(TAG, "demo_function_disconnect");
+            showToast("Device Disconnect");
+
+        }
+        else {
+            showToast("SDK Instance invalid, needs `SDK init`");
+        }
+    }
+
+    void demoSettingHRTimingMeasure(String userInput) {
+        if (mCareSettings == null) {
+            mCareSettings = _goFITSdk.getNewCareSettings();
+        }
+        String[] separated = userInput.split(",");
+        if (separated.length == 4) {
+            // Demo - HR timing measure setting
+            CareMeasureHR careMeasureHR = mCareSettings.getDefaultMeasureHR();
+            careMeasureHR.setRepeatDays(convertRepeatDay(127));
+            if (separated[0].equals("on") || separated[0].equals("off")) {
+                boolean enable = separated[0].equals("on") ? true : false;
+                careMeasureHR.setEnableMeasureHR(enable);
+            }
+            else {
+                showToast("Error Format (invalid input : must be `on` or `off`)");
+                return;
+            }
+
+            int startMin = convertHHmmToMin(separated[1]);
+            if (startMin >= 0 && startMin <= 1439) {
+                careMeasureHR.setStartMin((short) startMin);
+            }
+            else {
+                showToast("Error Format (invalid time format)");
+            }
+
+            int endMin = convertHHmmToMin(separated[2]);
+            if (endMin >= 0 && endMin <= 1439) {
+                careMeasureHR.setEndMin((short) endMin);
+            }
+            else {
+                showToast("Error Format (invalid time format)");
+            }
+
+            try {
+                int intervalMin = Integer.valueOf(separated[3]);
+                careMeasureHR.setInterval((short)intervalMin);
+            }
+            catch (NumberFormatException e) {
+                showToast("Error Format (not number format)");
+                return;
+            }
+
+            mCareSettings.setMeasureHR(careMeasureHR);
+            demoSetSettingToDevice();
+        }
+        else {
+            showToast("Error Format (invalid parameter counts)");
+        }
+    }
+
+    byte[] convertRepeatDay(int days) {
+        byte[] repeatDays = {0, 0, 0, 0, 0, 0, 0};
+        try {
+            repeatDays[0] = (byte) (((days & 0x01) == 1) ? 1 : 0);
+            repeatDays[1] = (byte) ((((days >> 1) & 0x01) == 1) ? 1 : 0);
+            repeatDays[2] = (byte) ((((days >> 2) & 0x01) == 1) ? 1 : 0);
+            repeatDays[3] = (byte) ((((days >> 3) & 0x01) == 1) ? 1 : 0);
+            repeatDays[4] = (byte) ((((days >> 4) & 0x01) == 1) ? 1 : 0);
+            repeatDays[5] = (byte) ((((days >> 5) & 0x01) == 1) ? 1 : 0);
+            repeatDays[6] = (byte) ((((days >> 6) & 0x01) == 1) ? 1 : 0);
+        } catch (Exception e) {
+            for (int i = 0; i < repeatDays.length; i++) {
+                repeatDays[i] = 0;
+            }
+        }
+
+        return repeatDays;
+    }
+
+    int convertHHmmToMin(String HHmm) {
+        try {
+            String[] timestamp = HHmm.split(":");
+            int hour = Integer.parseInt(timestamp[0]);
+            int minute = Integer.parseInt(timestamp[1]);
+            return (hour * 60 + minute);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    void demoSetSettingToDevice() {
+        // Demo - doSetSetting API
+        _goFITSdk.doSetSettings(mCareSettings, new GoFITSdk.SettingsCallback() {
+            @Override
+            public void onCompletion() {
+                Log.i(TAG, "doSetSettings() : onCompletion()");
+                showToast("Setting OK");
+//                Preference pPref = (Preference) findPreference("demo_function_setting");
+//                String summary = "Setting OK";
+//                pPref.setSummary(summary);
+            }
+
+            @Override
+            public void onProgress(String message) {
+                Log.i(TAG, "doSetSettings() : onProgress() : message = " + message);
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg) {
+                Log.e(TAG, "doSetSettings() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+                showToast("doSetSettings() : onFailure() : errorCode = " + errorCode + ", " + "errorMsg = " + errorMsg);
+            }
+        });
+
+    }
+
+    void showToast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    }
 
 }
