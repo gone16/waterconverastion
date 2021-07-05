@@ -11,11 +11,19 @@
         android:title="@string/title_location"/>
 
     <item
+        android:id="@+id/navigation_machine"
+        android:icon="@drawable/ic_machine"
+        android:title="@string/title_machine" />
+    <item
+        android:id="@+id/navigation_report"
+        android:icon="@drawable/ic_report"
+        android:title="@string/title_report"/>
+    <item
         android:id="@+id/navigation_setting"
         android:icon="@drawable/ic_settings_black_24dp"
-        android:title="@string/title_setting"/>
-    <item
-        android:id="@+id/navigation_parameter"
-        android:icon="@drawable/ic_tune_black_24dp"
-        android:title="@string/title_parameter"/>
+        android:title="@string/title_setting" />
+    <!--    <item-->
+<!--        android:id="@+id/navigation_parameter"-->
+<!--        android:icon="@drawable/ic_tune_black_24dp"-->
+<!--        android:title="@string/title_parameter"/>-->
 </menu>

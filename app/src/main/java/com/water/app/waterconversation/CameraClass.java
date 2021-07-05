@@ -13,12 +13,12 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
+import android.support.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.golife.contract.AppContract;
+//import com.golife.contract.AppContract;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -62,7 +62,7 @@ public class CameraClass {
             Manifest.permission_group.SMS,
             Manifest.permission_group.STORAGE
     };
-
+/*
     @SuppressWarnings("deprecation")
     public static Camera cameraGetCurrent() {
         return AppContract.mCamera;
@@ -250,4 +250,6 @@ public class CameraClass {
             return true;
         }
     }
+
+ */
 }

@@ -24,13 +24,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.water.app.waterconversation.GlobalVariable;
 import com.water.app.waterconversation.R;
 
 public class LocationFragment extends Fragment
         implements OnMapReadyCallback, GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationClickListener, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
-
+    public static boolean isLocationFragment = true;
     private String TAG = "LocationFragment";
 
     private GoogleMap mMap;
@@ -62,7 +63,11 @@ public class LocationFragment extends Fragment
 
         return v;
     }
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        isLocationFragment = false;
+    }
 
     @Override
     public void onMapReady(GoogleMap map) {

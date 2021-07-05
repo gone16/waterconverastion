@@ -3,16 +3,20 @@
     <color name="colorPrimary">#2196F3</color>
     <color name="colorPrimaryDark">#1976D2</color>
     <color name="colorPrimaryLight">#BBDEFB</color>
-    <color name="colorAccent">#03A9F4</color>
+    <color name="colorAccent">#f44336</color>
     <color name="colorPrimaryText">#212121</color>
     <color name="colorSecondaryText">#757575</color>
 
-    <color name="color_stop_detect">#ff5722</color>
+    <color name="color_stop_detect">#f44336</color>
+    <color name="color_start_detect">#009688</color>
 
-    <color name="color_drop">#f44336</color>
+    <color name="color_drop">#FFFFFF</color>
     <color name="color_fall">#ff6e40</color>
     <color name="color_coma">#ffab91</color>
     <color name="color_lost_balance">#3949ab</color>
     <color name="color_heavy_step">#8e24aa</color>
     <color name="color_suddenly_wobbing">#7c4dff</color>
+
+    <color name="color_danger">#f44336</color>
+    <color name="color_safe">#009100</color>
 </resources>

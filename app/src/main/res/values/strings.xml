@@ -1,6 +1,6 @@
 <resources>
     <!--app 名稱-->
-    <string name="app_name">水保計畫</string>
+    <string name="app_name">Construction Safety Guard</string>
 
     <!--頁面標題-->
     <string name="billboard_title">看板</string>
@@ -9,6 +9,8 @@
     <string name="title_billboard">看板</string>
     <string name="title_location">位置</string>
     <string name="title_setting">設定</string>
+    <string name="title_machine">機具</string>
+    <string name="title_report">危區回報</string>
     <string name="title_parameter">系統參數</string>
 
     <!--login UI-->
@@ -44,27 +46,56 @@
     <string name="alert_reset_title">確定要重置資料嗎?</string>
     <string name="alert_reset_yes">確定</string>
     <string name="alert_reset_no">否</string>
+    <string name="alert_cancel">關閉</string>
+    <string name="alert_look">查看</string>
+    <string name="daka_pic">拍照</string>
+    <string name="daka_wait">稍等</string>
+    <string name="button_dakaIn">打卡上班</string>
+    <string name="button_dakaOut">打卡下班</string>
     <string name="alert_logout">確定要登出嗎？</string>
     <string name="text_accumulation_title">累計資訊</string>
     <string name="text_accumulation_accident"></string>
     <string name="text_accumulation_portent"></string>
+    <string name="textView_altitude"></string>
+
+    <!--location UI-->
+    <string name="text_location">定位</string>
+
+    <!--machine UI-->
+    <string name="fragment_name">機具操作</string>
+    <string name="text_machine">操作機具：</string>
+    <string name="text_code">操作碼：</string>
+    <string name="text_danger_diameter">危險半徑：</string>
+    <string name="text_start_operating">開始操作</string>
+    <string name="text_machine_initial">機具定位</string>
+
+
+    <!--report UI-->
+    <string name="text_report_name">危險區域</string>
+    <string name="text_area_dis">區域描述：</string>
+    <string name="text_report_dia">半徑範圍：</string>
+    <string name="text_report_pic">照片：</string>
+    <string name="text_report_save">上傳</string>
+    <string name="text_report_descri">描述</string>
+    <string name="text_report_del">刪除</string>
+    <string name="text_report_add">新增</string>
+
 
     <!--setting UI-->
     <string name="text_setting_name">姓名或代號</string>
     <string name="text_setting_site">工地代號</string>
-    <string name="text_setting_sensitivity">敏感度</string>
+    <string name="text_setting_sensitivity">敏感度(向左降低，向右增高)</string>
     <string name="text_setting_sensitivity_drop">墜落</string>
     <string name="text_setting_sensitivity_fall">跌倒</string>
     <string name="text_setting_sensitivity_coma">昏迷</string>
-    <string name="text_setting_sensitivity_lost_balance">不穩</string>
-    <string name="text_setting_sensitivity_heavy_step">重踩</string>
-    <string name="text_setting_sensitivity_suddenly_wobbing">搖晃</string>
+    <string name="text_setting_sensitivity_lost_balance">前兆</string>
     <string name="text_setting_connect_state">狀態：未連接</string>
+    <string name="text_setting_percent_value">百分比</string>
     <string name="button_setting_save">儲存</string>
     <string name="button_setting_pair_wristband">配對手環</string>
     <string name="button_setting_comfirm_wristband">確認手環</string>
     <string name="button_setting_disconnect">斷開連線</string>
-    <string name="text_version">版本 1.2.1</string>
+    <string name="text_version">版本 1.2.6</string>
 
     <!--setting string-->
     <string name="setting_already_paired">已配對：</string>
@@ -96,6 +127,8 @@
     <string name="drop">墜落</string>
     <string name="fall">跌倒</string>
     <string name="coma">昏迷</string>
+    <string name="normal">沒事</string>
+    <string name="nodis">勿擾</string>
     <string name="lost_balance">失去平衡</string>
     <string name="heavy_step">突然重踩</string>
     <string name="suddenly_wobbing">突然晃動</string>
@@ -109,4 +142,21 @@
     <string name="sharePreferences_lost_balance">lost_balance</string>
     <string name="sharePreferences_heavy_step">heavy_step</string>
     <string name="sharePreferences_suddenly_wobbing">suddenly_wobbing</string>
+    <string name="sharePreferences_mname">mname</string>
+    <string name="sharePreferences_mradius">mradius</string>
+    <string name="title_activity_machine_fragement">MachineFragement</string>
+
+    <!--dangerAlarmReceiver key-->
+    <string name="danger_id">ID:</string>
+    <string name="danger_situ">狀態:</string>
+    <string name="danger_rescue">請前往確認情況</string>
+    <string name="danger_safe">沒事</string>
+    <string name="danger_info">鄰近人員發生危險:</string>
+    <string name="danger_danger">危險</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="msg_token_fmt">token</string>
+    <string name="title_activity_broadcast_receiver">BroadcastReceiver</string>
 </resources>

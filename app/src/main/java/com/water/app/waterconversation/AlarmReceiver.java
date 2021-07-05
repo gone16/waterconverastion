@@ -7,14 +7,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.water.app.waterconversation.Service.ForeService;
 
 public class AlarmReceiver extends Activity {
 
@@ -56,11 +61,10 @@ public class AlarmReceiver extends Activity {
         String textState = getIntent().getAction();
         setAlarmUI(textState);
 
-        handleTimeout.postDelayed(timesup,5000);
     }
 
 
-
+/**
     private Runnable timesup = new Runnable() {
         @Override
         public void run() {
@@ -74,7 +78,7 @@ public class AlarmReceiver extends Activity {
             finish();
         }
     };
-
+*/
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
 
         @Override
@@ -87,18 +91,16 @@ public class AlarmReceiver extends Activity {
 
             if(nowState == null) nowState = textState;
             if(textState.equals(Constants.ACTION.ALARM_ACCIDENTS_DROP)){
-                setAlarmUI(textState);
-                nowState = textState;
-                return;
+                    setAlarmUI(textState);
+                    nowState = textState;
+                    return;
             }
             if(textState.equals(Constants.ACTION.ALARM_ACCIDENTS_FALL)){
                 if(nowState.equals(Constants.ACTION.ALARM_ACCIDENTS_DROP)) return;
-                setAlarmUI(textState);
-                nowState = textState;
+                    setAlarmUI(textState);
+                    nowState = textState;
                 return;
             }
-
-
             Log.d(TAG, "onReceive: "+textState);
         }
 
@@ -124,7 +126,7 @@ public class AlarmReceiver extends Activity {
                     button2.setText(R.string.coma);
                     globalVariable.setAccidentAlarming(true);
                     globalVariable.setAlarmAccident(Constants.ACCIDENTS.DROP);
-                    globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.UNKNOWN);
+                    globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.DROPUNKNOWN);
                     Log.d(TAG, "Drop");
                     break;
 
@@ -138,8 +140,22 @@ public class AlarmReceiver extends Activity {
                     button2.setText(R.string.coma);
                     globalVariable.setAccidentAlarming(true);
                     globalVariable.setAlarmAccident(Constants.ACCIDENTS.FALL);
-                    globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.UNKNOWN);
+                    globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.FALLUNKNOWN);
                     Log.d(TAG, "Fall");
+                    break;
+
+                    //更新為詢問UI
+                case Constants.ACTION.ALARM_ASK:
+                    textViewTitle.setTextColor(getResources().getColor(R.color.color_coma));
+                    textViewTitle.setText(R.string.coma);
+                    button1.setTextColor(getResources().getColor(R.color.color_drop));
+                    button1.setText(R.string.normal);
+                    button2.setTextColor(getResources().getColor(R.color.color_fall));
+                    button2.setText(R.string.nodis);
+                    globalVariable.setAccidentAlarming(true);
+                    globalVariable.setAlarmAccident(Constants.ACCIDENTS.ASK);
+                    globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.ASK);
+                    Log.d(TAG, "ASK");
                     break;
 
                     //更新為昏迷UI
@@ -152,7 +168,7 @@ public class AlarmReceiver extends Activity {
                     button2.setText(R.string.fall);
                     globalVariable.setAccidentAlarming(true);
                     globalVariable.setAlarmAccident(Constants.ACCIDENTS.COMA);
-                    globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.UNKNOWN);
+                    globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.COMAUNKNOWN);
                     Log.d(TAG, "Coma");
                     break;
 
@@ -218,7 +234,6 @@ public class AlarmReceiver extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        handleTimeout.removeCallbacks(timesup);
         unregisterReceiver(mMessageReceiver);
         Log.d(TAG, "onDestroy: ");
         if(mMediaPlayer.isPlaying()){
@@ -294,6 +309,9 @@ public class AlarmReceiver extends Activity {
                     case Constants.ACCIDENTS.FALL:
                         globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.DROP);
                         break;
+                    case Constants.ACCIDENTS.ASK:
+                        globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.COMA);
+                        break;
                     case Constants.ACCIDENTS.COMA:
                         globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.DROP);
                         break;
@@ -337,6 +355,11 @@ public class AlarmReceiver extends Activity {
                     case Constants.ACCIDENTS.FALL:
                         globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.COMA);
                         break;
+                    case Constants.ACCIDENTS.ASK:
+                        globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.NORMAL);
+                        pauseService();
+                        setCount();
+                        break;
                     case Constants.ACCIDENTS.COMA:
                         globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.FALL);
                         break;
@@ -365,6 +388,34 @@ public class AlarmReceiver extends Activity {
                 finish();
             }
         });
+    }
+
+    private void setCount() {
+        CountDownTimer c = new CountDownTimer(3600000,1800000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Toast.makeText(getApplicationContext(), "倒數30分", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFinish() {
+                startForeService();
+            }
+        };
+    }
+
+    private void pauseService() {
+        Intent serviceIntent = new Intent(this.getApplicationContext(), ForeService.class);
+        serviceIntent.setAction(Constants.ACTION.STOP_FOREGROUND_ACTION);
+        getApplicationContext().stopService(serviceIntent);
+    }
+
+    private void startForeService() {
+
+        Intent intent = new Intent(this.getApplicationContext(), ForeService.class);
+        intent.setAction(Constants.ACTION.START_FOREGROUND_ACTION);
+        if (this.getApplicationContext() == null) return;
+        ContextCompat.startForegroundService(this.getApplicationContext(), intent);
     }
 
     public void onBackPressed() {

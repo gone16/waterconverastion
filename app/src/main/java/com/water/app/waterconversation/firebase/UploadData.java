@@ -12,14 +12,17 @@ public class UploadData {
     public float latitude;
     public float longitude;
     public float accX,accY,accZ;
-    public int accident,accidentAns,portent,portentAns;
+    public int accident,portent;
     public String site;
     public float altitude;
-    public float heartRate;
+    public String token;
+    public Boolean machine;
+    public String machineName;
+    public String receiveAns;
 
     public UploadData(String id, String idDevice, String date, String time, float latitude, float longitude,
-                float accX, float accY, float accZ, int accident, int accidentAns, int portent,
-                int portentAns, String site, float altitude,float heartRate) {
+                      float accX, float accY, float accZ, int accident, int portent, String site, float altitude,
+                      String token,Boolean machine,String machineName,String receiveAns) {
         this.id = id;
         this.idDevice = idDevice;
         this.date = date;
@@ -30,11 +33,12 @@ public class UploadData {
         this.accY = accY;
         this.accZ = accZ;
         this.accident = accident;
-        this.accidentAns = accidentAns;
         this.portent = portent;
-        this.portentAns = portentAns;
         this.site = site;
         this.altitude = altitude;
-        this.heartRate = heartRate;
+        this.token = token;
+        this.machine = machine;
+        this.machineName = machineName;
+        this.receiveAns = receiveAns;
     }
 }

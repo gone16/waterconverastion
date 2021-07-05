@@ -4,263 +4,360 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-<android.support.constraint.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/textView_setting_sensitivity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="144dp"
-        android:text="@string/text_setting_sensitivity"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_setting_pair_wristband" />
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#A0DAD8"
+        android:minHeight="660dp">
 
-    <SeekBar
-        android:id="@+id/seekBar_setting_drop"
-        android:layout_width="120dp"
-        android:layout_height="20dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/guideline6"
-        app:layout_constraintTop_toBottomOf="@+id/textView_setting_sensitivity" />
+        <EditText
+            android:id="@+id/editText_settingfragment_number"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            app:layout_constraintStart_toEndOf="@+id/textView_settingfragment_name"
+            app:layout_constraintTop_toBottomOf="@+id/editText_settingfragment_site" />
 
-    <SeekBar
-        android:id="@+id/seekBar_setting_fall"
-        android:layout_width="120dp"
-        android:layout_height="21dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/guideline6"
-        app:layout_constraintTop_toBottomOf="@+id/seekBar_setting_drop" />
+        <Switch
+            android:id="@+id/switch_accident"
+            android:layout_width="300dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="16dp"
+            android:scrollbarSize="20sp"
+            android:switchPadding="50dp"
+            android:text="@string/switch_accident"
+            android:textColorLink="#43D243"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
-    <SeekBar
-        android:id="@+id/seekBar_setting_coma"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/guideline6"
-        app:layout_constraintTop_toBottomOf="@+id/seekBar_setting_fall" />
+        <Switch
+            android:id="@+id/switch_precursor"
+            android:layout_width="300dp"
+            android:layout_height="18dp"
+            android:layout_marginTop="16dp"
+            android:scrollbarSize="20sp"
+            android:switchPadding="50dp"
+            android:text="@string/switch_precursor"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/switch_accident" />
 
-    <SeekBar
-        android:id="@+id/seekBar_setting_lost_balance"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toEndOf="@+id/text_setting_sensitivity_lost_balance"
-        app:layout_constraintTop_toBottomOf="@+id/textView_setting_sensitivity" />
+        <Switch
+            android:id="@+id/switch_location"
+            android:layout_width="300dp"
+            android:layout_height="2dp"
+            android:layout_marginTop="16dp"
+            android:scrollbarSize="20sp"
+            android:switchPadding="50dp"
+            android:text="@string/switch_location"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/switch_precursor" />
 
-    <SeekBar
-        android:id="@+id/seekBar_setting_heavy_step"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toEndOf="@+id/text_setting_sensitivity_heavy_step"
-        app:layout_constraintTop_toBottomOf="@+id/seekBar_setting_lost_balance" />
+        <Switch
+            android:id="@+id/switch_accident_alarm"
+            android:layout_width="300dp"
+            android:layout_height="26dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="sans-serif"
+            android:scrollbarSize="20sp"
+            android:switchPadding="50dp"
+            android:text="@string/switch_accident_alarm"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/switch_location" />
 
-    <SeekBar
-        android:id="@+id/seekBar_setting_suddenly_wobbing"
-        android:layout_width="120dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toEndOf="@+id/text_setting_sensitivity_suddenly_wobbing"
-        app:layout_constraintTop_toBottomOf="@+id/seekBar_setting_heavy_step" />
+        <Switch
+            android:id="@+id/switch_portent_alarm"
+            android:layout_width="300dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#ff4436"
+            android:scrollbarSize="20sp"
+            android:switchPadding="50dp"
+            android:text="@string/switch_portent_alarm"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/switch_accident_alarm" />
 
-    <TextView
-        android:id="@+id/text_setting_sensitivity_drop"
-        android:layout_width="wrap_content"
-        android:layout_height="24sp"
-        android:text="@string/text_setting_sensitivity_drop"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toStartOf="@+id/seekBar_setting_drop"
-        app:layout_constraintTop_toTopOf="@+id/seekBar_setting_drop" />
+        <TextView
+            android:id="@+id/textView_setting_sensitivity"
+            android:layout_width="157dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:text="敏感度(低→高)"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/switch_portent_alarm" />
 
-    <TextView
-        android:id="@+id/text_setting_sensitivity_fall"
-        android:layout_width="wrap_content"
-        android:layout_height="24sp"
-        android:text="@string/text_setting_sensitivity_fall"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toStartOf="@+id/seekBar_setting_fall"
-        app:layout_constraintTop_toTopOf="@+id/seekBar_setting_fall" />
+        <SeekBar
+            android:id="@+id/seekBar_setting_drop"
+            style="@android:style/Widget.Material.SeekBar"
+            android:layout_width="240dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="12dp"
+            android:foregroundTint="#00596F45"
+            android:progressTint="#43D243"
+            android:thumb="@drawable/custom_thumb"
+            app:layout_constraintEnd_toEndOf="@+id/switch_portent_alarm"
+            app:layout_constraintTop_toBottomOf="@+id/textView_setting_sensitivity" />
 
-    <TextView
-        android:id="@+id/text_setting_sensitivity_coma"
-        android:layout_width="wrap_content"
-        android:layout_height="24sp"
-        android:text="@string/text_setting_sensitivity_coma"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toStartOf="@+id/seekBar_setting_coma"
-        app:layout_constraintTop_toTopOf="@+id/seekBar_setting_coma" />
+        <SeekBar
+            android:id="@+id/seekBar_setting_fall"
+            style="@android:style/Widget.Material.SeekBar"
+            android:layout_width="240dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="16dp"
+            android:max="100"
+            android:progressTint="#43D243"
+            android:thumb="@drawable/custom_thumb"
+            app:layout_constraintEnd_toEndOf="@+id/seekBar_setting_drop"
+            app:layout_constraintTop_toBottomOf="@+id/seekBar_setting_drop" />
 
-    <TextView
-        android:id="@+id/text_setting_sensitivity_lost_balance"
-        android:layout_width="wrap_content"
-        android:layout_height="24sp"
-        android:layout_marginStart="8dp"
-        android:text="@string/text_setting_sensitivity_lost_balance"
-        android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="@+id/guideline6"
-        app:layout_constraintTop_toTopOf="@+id/seekBar_setting_lost_balance" />
+        <SeekBar
+            android:id="@+id/seekBar_setting_coma"
+            android:layout_width="240dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="16dp"
+            android:progressTint="#43D243"
+            android:thumb="@drawable/custom_thumb"
+            app:layout_constraintEnd_toEndOf="@+id/seekBar_setting_fall"
+            app:layout_constraintTop_toBottomOf="@+id/seekBar_setting_fall" />
 
-    <TextView
-        android:id="@+id/text_setting_sensitivity_heavy_step"
-        android:layout_width="wrap_content"
-        android:layout_height="24sp"
-        android:layout_marginStart="8dp"
-        android:text="@string/text_setting_sensitivity_heavy_step"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toStartOf="@+id/seekBar_setting_heavy_step"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline6"
-        app:layout_constraintTop_toTopOf="@+id/seekBar_setting_heavy_step" />
+        <SeekBar
+            android:id="@+id/seekBar_setting_portent"
+            android:layout_width="240dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="16dp"
+            android:progressTint="#43D243"
+            android:thumb="@drawable/custom_thumb"
+            app:layout_constraintEnd_toEndOf="@+id/seekBar_setting_coma"
+            app:layout_constraintTop_toBottomOf="@+id/seekBar_setting_coma" />
 
-    <TextView
-        android:id="@+id/text_setting_sensitivity_suddenly_wobbing"
-        android:layout_width="wrap_content"
-        android:layout_height="24sp"
-        android:layout_marginStart="8dp"
-        android:text="@string/text_setting_sensitivity_suddenly_wobbing"
-        android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="@+id/guideline6"
-        app:layout_constraintTop_toTopOf="@+id/seekBar_setting_suddenly_wobbing" />
+        <TextView
+            android:id="@+id/text_setting_sensitivity_drop"
+            android:layout_width="wrap_content"
+            android:layout_height="24sp"
+            android:fontFamily="sans-serif"
+            android:text="@string/text_setting_sensitivity_drop"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@+id/seekBar_setting_drop"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/switch_portent_alarm"
+            app:layout_constraintTop_toTopOf="@+id/seekBar_setting_drop" />
 
-    <EditText
-        android:id="@+id/editText_settingfragment_name"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="72dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toEndOf="@+id/textView_settingfragment_name"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/text_setting_sensitivity_coma"
+            android:layout_width="wrap_content"
+            android:layout_height="24sp"
+            android:layout_marginTop="16dp"
+            android:text="@string/text_setting_sensitivity_coma"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@+id/seekBar_setting_coma"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/text_setting_sensitivity_fall"
+            app:layout_constraintTop_toBottomOf="@+id/text_setting_sensitivity_fall" />
 
-    <EditText
-        android:id="@+id/editText_settingfragment_site"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toEndOf="@+id/textView_settingfragment_name"
-        app:layout_constraintTop_toBottomOf="@+id/editText_settingfragment_name" />
+        <TextView
+            android:id="@+id/text_setting_sensitivity_fall"
+            android:layout_width="32dp"
+            android:layout_height="19dp"
+            android:text="@string/text_setting_sensitivity_fall"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@+id/seekBar_setting_fall"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/text_setting_sensitivity_drop"
+            app:layout_constraintTop_toTopOf="@+id/seekBar_setting_fall" />
 
-    <Button
-        android:id="@+id/button_settingfragment_save"
-        android:layout_width="wrap_content"
-        android:layout_height="43dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="124dp"
-        android:layout_marginEnd="24dp"
-        android:text="@string/button_setting_save"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.448"
-        app:layout_constraintStart_toEndOf="@+id/editText_settingfragment_site"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/text_setting_sensitivity_lost_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="24sp"
+            android:layout_marginEnd="28dp"
+            android:text="@string/text_setting_sensitivity_lost_balance"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@+id/seekBar_setting_portent"
+            app:layout_constraintStart_toStartOf="@+id/text_setting_sensitivity_coma"
+            app:layout_constraintTop_toTopOf="@+id/seekBar_setting_portent" />
 
-    <TextView
-        android:id="@+id/textView_settingfragment_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="80dp"
-        android:text="@string/text_setting_name"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <EditText
+            android:id="@+id/editText_settingfragment_name"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="76dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            app:layout_constraintStart_toEndOf="@+id/textView_settingfragment_name"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textView_settingfragment_site"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/text_setting_site"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_settingfragment_name" />
+        <EditText
+            android:id="@+id/editText_settingfragment_site"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            app:layout_constraintStart_toEndOf="@+id/textView_settingfragment_name"
+            app:layout_constraintTop_toBottomOf="@+id/editText_settingfragment_name" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="180dp"
-        android:layout_marginEnd="204dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintGuide_begin="191dp"
-        app:layout_constraintStart_toStartOf="parent" />
+        <Button
+            android:id="@+id/button_settingfragment_save"
+            android:layout_width="wrap_content"
+            android:layout_height="43dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="74dp"
+            android:layout_marginEnd="24dp"
+            android:text="@string/button_setting_save"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.448"
+            app:layout_constraintStart_toEndOf="@+id/editText_settingfragment_site"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textView_version"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:text="@string/text_version"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <Button
+            android:id="@+id/button_bind"
+            android:layout_width="wrap_content"
+            android:layout_height="43dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="128dp"
+            android:layout_marginEnd="24dp"
+            android:text="綁定"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.448"
+            app:layout_constraintStart_toEndOf="@+id/editText_settingfragment_site"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/button_setting_pair_wristband"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="32dp"
-        android:text="@string/button_setting_pair_wristband"
-        android:visibility="visible"
-        app:layout_constraintEnd_toStartOf="@+id/button_setting_comfirm_wristband"
-        app:layout_constraintTop_toBottomOf="@+id/textview_setting_wristband_connect_state" />
+        <TextView
+            android:id="@+id/textView_settingfragment_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="84dp"
+            android:text="@string/text_setting_name"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textview_setting_wristband_connect_state"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="8dp"
-        android:text="@string/text_setting_connect_state"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText_settingfragment_site" />
+        <TextView
+            android:id="@+id/textView_settingfragment_site"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="30dp"
+            android:textAllCaps="true"
+            android:text="@string/text_setting_site"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_settingfragment_name" />
 
-    <!--<Button-->
-        <!--android:id="@+id/button"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="Button"-->
-        <!--tools:layout_editor_absoluteX="16dp"-->
-        <!--tools:layout_editor_absoluteY="38dp"-->
-        <!--android:visibility="gone"/>-->
+        <TextView
+            android:id="@+id/textView_settingfragment_phonenumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="30dp"
+            android:inputType="number"
+            android:text="電話號"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_settingfragment_site" />
 
-    <Button
-        android:id="@+id/button_setting_comfirm_wristband"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="@string/button_setting_comfirm_wristband"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/button_setting_pair_wristband" />
+        <TextView
+            android:id="@+id/textView_settingfragment_fbt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="20dp"
+            android:inputType="number"
+            android:text="電話號"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_settingfragment_phonenumber" />
 
-    <Button
-        android:id="@+id/button_setting_disconnect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:text="@string/button_setting_disconnect"
-        app:layout_constraintStart_toEndOf="@+id/button_setting_comfirm_wristband"
-        app:layout_constraintTop_toTopOf="@+id/button_setting_comfirm_wristband" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="180dp"
+            android:layout_marginEnd="204dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintGuide_end="222dp"
+            app:layout_constraintStart_toStartOf="parent" />
 
-</android.support.constraint.ConstraintLayout>
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="180dp"
+            android:layout_marginEnd="204dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintGuide_end="222dp"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <EditText
+            android:id="@+id/editText_settingfragment_fbtime"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            app:layout_constraintStart_toEndOf="@+id/textView_settingfragment_name"
+            app:layout_constraintTop_toBottomOf="@+id/editText_settingfragment_number" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="40dp"
+            android:text="工地安全雲端監測系統"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="通知設定"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_settingfragment_fbt" />
+
+        <TextView
+            android:id="@+id/text_setting_percent_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="百分比"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.688"
+            app:layout_constraintStart_toEndOf="@+id/textView_setting_sensitivity"
+            app:layout_constraintTop_toBottomOf="@+id/switch_portent_alarm" />
+
+    </android.support.constraint.ConstraintLayout>
 </ScrollView>

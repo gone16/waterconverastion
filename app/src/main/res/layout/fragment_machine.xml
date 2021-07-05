@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient"
+    android:minWidth="720dp">
+
+    <TextView
+        android:id="@+id/text_machine"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        android:text="@string/text_machine"
+        android:textColor="#32393b"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_f_machine" />
+
+
+    <TextView
+        android:id="@+id/text_f_machine"
+        android:layout_width="100dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="45dp"
+        android:text="@string/fragment_name"
+        android:textColor="#32393b"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_raidus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        android:text="@string/text_danger_diameter"
+        android:textColor="#32393b"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_machine" />
+
+    <Button
+        android:id="@+id/button_M_start"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="215dp"
+        android:background="@drawable/button_rounde"
+        android:backgroundTint="#26922B"
+        android:text="@string/text_start_operating"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.218"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText_machine_code" />
+
+    <Button
+        android:id="@+id/button_M_initial"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="215dp"
+        android:background="@drawable/button_rounde"
+        android:backgroundTint="#238091"
+        android:text="@string/text_machine_initial"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.816"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText_machine_code" />
+
+    <EditText
+        android:id="@+id/editText_machine_radius"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:ems="10"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/text_raidus"
+        app:layout_constraintTop_toBottomOf="@+id/editText_machine_name" />
+
+    <EditText
+        android:id="@+id/editText_machine_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:ems="10"
+        android:inputType="text"
+        app:layout_constraintStart_toEndOf="@+id/text_raidus"
+        app:layout_constraintTop_toBottomOf="@+id/text_f_machine" />
+
+    <TextView
+        android:id="@+id/textcode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="45dp"
+        android:text="@string/text_code"
+        android:textColor="#32393b"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_raidus" />
+
+    <EditText
+        android:id="@+id/editText_machine_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:ems="10"
+        android:inputType="number"
+        app:layout_constraintStart_toStartOf="@+id/editText_machine_radius"
+        app:layout_constraintTop_toBottomOf="@+id/editText_machine_radius" />
+
+</android.support.constraint.ConstraintLayout>

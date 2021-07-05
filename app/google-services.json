@@ -8,18 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:185826267369:android:e909de7443911a15",
+        "mobilesdk_app_id": "1:185826267369:android:7881ea7b4ea58436966078",
         "android_client_info": {
           "package_name": "com.water.app.waterconversation"
         }
       },
       "oauth_client": [
         {
-          "client_id": "185826267369-f2ofjkmqfsod70vked92a3qmebdun015.apps.googleusercontent.com",
+          "client_id": "185826267369-8eueuq0hq7huh38j8qtgeti27tru4a54.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.water.app.waterconversation",
-            "certificate_hash": "469ecb9a02f9f9c0881e77b2468dde731dd2706b"
+            "certificate_hash": "085c2d0660c06d851a3adc1a075adac6793f1518"
           }
         },
         {

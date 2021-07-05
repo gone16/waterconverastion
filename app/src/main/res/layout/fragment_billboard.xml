@@ -6,281 +6,244 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-
-        <Switch
-            android:id="@+id/switch_accident"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="26dp"
-            android:layout_marginTop="100dp"
-            android:layout_marginEnd="26dp"
-            android:scrollbarSize="20sp"
-            android:switchPadding="30dp"
-            android:text="@string/switch_accident"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toStartOf="@+id/guideline"
-            app:layout_constraintHorizontal_bias="0.545"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Switch
-            android:id="@+id/switch_precursor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="26dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="26dp"
-            android:scrollbarSize="20sp"
-            android:switchPadding="30dp"
-            android:text="@string/switch_precursor"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toStartOf="@+id/guideline"
-            app:layout_constraintHorizontal_bias="0.545"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/switch_accident" />
-
-        <Switch
-            android:id="@+id/switch_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="26dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="26dp"
-            android:scrollbarSize="20sp"
-            android:switchPadding="30dp"
-            android:text="@string/switch_location"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toStartOf="@+id/guideline"
-            app:layout_constraintHorizontal_bias="0.545"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/switch_precursor" />
-
-        <Switch
-            android:id="@+id/switch_accident_alarm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="26dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="26dp"
-            android:scrollbarSize="20sp"
-            android:switchPadding="30dp"
-            android:text="@string/switch_accident_alarm"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toStartOf="@+id/guideline"
-            app:layout_constraintHorizontal_bias="0.545"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/switch_location" />
-
-        <Switch
-            android:id="@+id/switch_portent_alarm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="26dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="26dp"
-            android:scrollbarSize="20sp"
-            android:switchPadding="30dp"
-            android:text="@string/switch_portent_alarm"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toStartOf="@+id/guideline"
-            app:layout_constraintHorizontal_bias="0.545"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/switch_accident_alarm" />
-
-        <Button
-            android:id="@+id/button_start"
-            style="@style/AppTheme.Button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="100dp"
-            android:layout_marginEnd="8dp"
-            android:text="@string/button_start"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.488"
-            app:layout_constraintStart_toStartOf="@+id/guideline"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/button_reset"
-            style="@style/AppTheme.Button"
-            android:layout_width="wrap_content"
-            android:layout_height="47dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="8dp"
-            android:text="@string/button_reset"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.488"
-            app:layout_constraintStart_toStartOf="@+id/guideline"
-            app:layout_constraintTop_toBottomOf="@+id/button_start" />
-
-        <android.support.constraint.Guideline
-            android:id="@+id/guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="205dp" />
-
-        <!--<TextView-->
-        <!--android:id="@+id/textview_test"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginStart="92dp"-->
-        <!--android:layout_marginTop="288dp"-->
-        <!--android:text="1234"-->
-        <!--android:textSize="30sp"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-        <!--<Button-->
-        <!--android:id="@+id/button_billfragment_logout"-->
-        <!--style="@style/AppTheme.Button"-->
-        <!--android:layout_width="71dp"-->
-        <!--android:layout_height="35dp"-->
-        <!--android:layout_marginTop="8dp"-->
-        <!--android:layout_marginEnd="8dp"-->
-        <!--android:text="@string/button_billboard_logout"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-        <TextView
-            android:id="@+id/text_accumulation_title"
-            android:layout_width="wrap_content"
-            android:layout_height="23dp"
-            android:layout_marginStart="36dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="108dp"
-            android:text="@string/text_accumulation_title"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toStartOf="@+id/guideline"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/switch_portent_alarm" />
-
-        <TextView
-            android:id="@+id/text_accumulation_accident"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="36dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/text_accumulation_accident"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_accumulation_title" />
-
-        <TextView
-            android:id="@+id/text_accumulation_portent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/text_accumulation_portent"
-            android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@+id/text_accumulation_accident"
-            app:layout_constraintTop_toBottomOf="@+id/text_accumulation_title" />
-
-        <!--<EditText-->
-            <!--android:id="@+id/editText_billboardfragment_name"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginStart="8dp"-->
-            <!--android:layout_marginTop="8dp"-->
-            <!--android:layout_marginEnd="8dp"-->
-            <!--android:ems="10"-->
-            <!--android:inputType="textPersonName"-->
-            <!--app:layout_constraintEnd_toEndOf="parent"-->
-            <!--app:layout_constraintStart_toStartOf="parent"-->
-            <!--app:layout_constraintTop_toBottomOf="@+id/textView_billboardfragment_name" />-->
-
-        <!--<EditText-->
-            <!--android:id="@+id/editText_billboardfragment_site"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginStart="8dp"-->
-            <!--android:layout_marginTop="16dp"-->
-            <!--android:layout_marginEnd="8dp"-->
-            <!--android:ems="10"-->
-            <!--android:inputType="textPersonName"-->
-            <!--app:layout_constraintEnd_toEndOf="parent"-->
-            <!--app:layout_constraintStart_toStartOf="parent"-->
-            <!--app:layout_constraintTop_toBottomOf="@+id/textView_billboardfragment_site" />-->
-
-        <!--<Button-->
-            <!--android:id="@+id/button_billboardfragment_save"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="43dp"-->
-            <!--android:layout_marginStart="8dp"-->
-            <!--android:layout_marginTop="24dp"-->
-            <!--android:layout_marginEnd="8dp"-->
-            <!--android:text="儲存"-->
-            <!--app:layout_constraintEnd_toEndOf="parent"-->
-            <!--app:layout_constraintStart_toStartOf="parent"-->
-            <!--app:layout_constraintTop_toBottomOf="@+id/editText_billboardfragment_site" />-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/textView_billboardfragment_name"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginStart="8dp"-->
-            <!--android:layout_marginTop="32dp"-->
-            <!--android:layout_marginEnd="8dp"-->
-            <!--android:text="姓名或代號"-->
-            <!--android:textSize="20sp"-->
-            <!--app:layout_constraintEnd_toEndOf="parent"-->
-            <!--app:layout_constraintStart_toStartOf="parent"-->
-            <!--app:layout_constraintTop_toBottomOf="@+id/text_accumulation_portent" />-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/textView_billboardfragment_site"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginStart="8dp"-->
-            <!--android:layout_marginTop="24dp"-->
-            <!--android:layout_marginEnd="8dp"-->
-            <!--android:text="工地代號"-->
-            <!--android:textSize="20sp"-->
-            <!--app:layout_constraintEnd_toEndOf="parent"-->
-            <!--app:layout_constraintStart_toStartOf="parent"-->
-            <!--app:layout_constraintTop_toBottomOf="@+id/editText_billboardfragment_name" />-->
-
-        <com.github.mikephil.charting.charts.BarChart
-            android:id="@+id/barChart"
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:layout_marginTop="16dp"
-            android:visibility="visible"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_gradient">
 
-            app:layout_constraintTop_toBottomOf="@+id/text_accumulation_accident" />
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/lineChart"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            app:layout_constraintTop_toBottomOf="@+id/barChart"
-            />
+                <TextView
+                    android:id="@+id/time2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="35dp"
+                    android:layout_marginEnd="20dp"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toStartOf="@+id/daka2"
+                    app:layout_constraintTop_toBottomOf="@+id/button_daka" />
 
-        <!--<Button-->
-        <!--android:id="@+id/button_test"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginStart="8dp"-->
-        <!--android:layout_marginTop="8dp"-->
-        <!--android:layout_marginEnd="8dp"-->
-        <!--android:text="test"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintHorizontal_bias="0.501"-->
-        <!--app:layout_constraintStart_toStartOf="parent"-->
-        <!--app:layout_constraintTop_toBottomOf="@+id/button_billboardfragment_save" />-->
+                <View
+                    android:id="@+id/view2"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/bg_secondlayer"
+                    app:layout_constraintBottom_toBottomOf="@+id/lineChart"
+                    app:layout_constraintEnd_toEndOf="@+id/guideline10"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="@+id/guideline7"
+                    app:layout_constraintTop_toBottomOf="@+id/view"
+                    app:layout_constraintVertical_bias="0.0" />
 
-</android.support.constraint.ConstraintLayout>
+                <TextClock
+                    android:id="@+id/textdate"
+                    android:layout_width="200sp"
+                    android:layout_height="50sp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="70dp"
+                    android:fontFamily="sans-serif-light"
+                    android:format12Hour="yyyy/MM/dd"
+                    android:gravity="center_horizontal"
+                    android:textColor="#5B5B5B"
+                    android:textSize="18sp"
+                    android:textStyle="normal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.501"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:targetApi="jelly_bean_mr1" />
+
+                <TextClock
+                    android:id="@+id/textClock"
+                    android:layout_width="200sp"
+                    android:layout_height="50sp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="90dp"
+                    android:fontFamily="sans-serif-light"
+                    android:format12Hour="HH:mm:ss"
+                    android:gravity="center_horizontal"
+                    android:textSize="40sp"
+                    android:textStyle="normal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.501"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:targetApi="jelly_bean_mr1" />
+
+                <Button
+                    android:id="@+id/button_daka"
+                    android:layout_width="130dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:background="@drawable/button_rounde"
+                    android:backgroundTint="#009B24"
+                    android:text="@string/button_dakaIn"
+                    android:textColor="#FFFFFF"
+                    android:textSize="25sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textClock" />
+
+                <Button
+                    android:id="@+id/button_D_start"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="150dp"
+                    android:background="@drawable/button_rounde"
+                    android:backgroundTint="#dd8d00"
+                    android:text="@string/button_start"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline"
+                    app:layout_constraintStart_toStartOf="@+id/guideline7"
+                    app:layout_constraintTop_toBottomOf="@+id/textClock" />
+
+                <TextView
+                    android:id="@+id/text_accumulation_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="23dp"
+                    android:layout_marginTop="200dp"
+                    android:text="@string/text_accumulation_title"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline10"
+                    app:layout_constraintStart_toStartOf="@+id/guideline7"
+                    app:layout_constraintTop_toBottomOf="@+id/textClock" />
+
+                <TextView
+                    android:id="@+id/text_accumulation_accident"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/text_accumulation_accident"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline"
+                    app:layout_constraintStart_toStartOf="@+id/view2"
+                    app:layout_constraintTop_toBottomOf="@+id/text_accumulation_title" />
+
+                <TextView
+                    android:id="@+id/text_accumulation_portent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="@string/text_accumulation_portent"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toStartOf="@+id/textView_altitude"
+                    app:layout_constraintStart_toStartOf="@+id/guideline"
+                    app:layout_constraintTop_toBottomOf="@+id/text_accumulation_title" />
+
+
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/barChart"
+                    android:layout_width="0dp"
+                    android:layout_height="180dp"
+                    android:layout_marginTop="16dp"
+
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline10"
+                    app:layout_constraintStart_toStartOf="@+id/guideline7"
+                    app:layout_constraintTop_toBottomOf="@+id/text_accumulation_accident" />
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/lineChart"
+                    android:layout_width="0dp"
+                    android:layout_height="180dp"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline10"
+                    app:layout_constraintStart_toStartOf="@+id/guideline7"
+                    app:layout_constraintTop_toBottomOf="@+id/barChart" />
+
+                <TextView
+                    android:id="@+id/textView_altitude"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline10"
+                    app:layout_constraintTop_toBottomOf="@+id/text_accumulation_title" />
+
+                <TextView
+                    android:id="@+id/daka1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:layout_marginTop="10dp"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="@+id/guideline"
+                    app:layout_constraintTop_toBottomOf="@+id/button_daka" />
+
+                <View
+                    android:id="@+id/view"
+                    android:layout_width="0dp"
+                    android:layout_height="5dp"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="72dp"
+                    android:background="#5B5B5B"
+                    app:layout_constraintEnd_toEndOf="@+id/guideline10"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="@+id/guideline7"
+                    app:layout_constraintTop_toBottomOf="@+id/button_daka" />
+
+                <Button
+                    android:id="@+id/button_reset"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_rounde"
+                    android:backgroundTint="#238091"
+                    android:text="@string/button_reset"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/button_D_start"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline10"
+                    app:layout_constraintHorizontal_bias="0.493"
+                    app:layout_constraintStart_toStartOf="@+id/guideline" />
+
+                <TextView
+                    android:id="@+id/daka2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="50dp"
+                    android:layout_marginTop="35dp"
+                    android:textSize="14sp"
+                    app:layout_constraintStart_toStartOf="@+id/guideline"
+                    app:layout_constraintTop_toBottomOf="@+id/button_daka" />
+
+
+                <TextView
+                    android:id="@+id/time1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="20dp"
+                    android:text="2020/07/05 16:07:23"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toStartOf="@+id/daka1"
+                    app:layout_constraintTop_toBottomOf="@+id/button_daka" />
+
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_begin="25dp"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="25dp"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintGuide_end="25dp" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
 
 </ScrollView>

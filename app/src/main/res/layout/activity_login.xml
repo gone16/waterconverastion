@@ -47,6 +47,7 @@
 
     <Button
         android:id="@+id/button_login"
+        style="@style/AppTheme.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -54,7 +55,6 @@
         android:layout_marginEnd="16dp"
         android:text="@string/button_login"
         android:textSize="25dp"
-        style="@style/AppTheme.Button"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintHorizontal_bias="0.978"
         app:layout_constraintStart_toStartOf="parent"
@@ -62,6 +62,7 @@
 
     <Button
         android:id="@+id/button_register"
+        style="@style/AppTheme.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -69,7 +70,6 @@
         android:layout_marginEnd="8dp"
         android:text="@string/button_register"
         android:textSize="25dp"
-        style="@style/AppTheme.Button"
         app:layout_constraintEnd_toEndOf="@+id/barrier2"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline2"

@@ -7,13 +7,12 @@ public class CSVDataBean {
     public String time;
     public float latitude;
     public float longitude;
-    public float accX,accY,accZ;
-    public int accident,accidentAns,portent,portentAns;
+    public float accX,accY,accZ,pitch,roll;
+    public int accident,portent;
     public String site;
     public float altitude;
-    public int heartRate;
 
-    public CSVDataBean(String id, String idDevice, String date, String time, float latitude, float longitude, float accX, float accY, float accZ, int accident, int accidentAns, int portent, int portentAns, String site, float altitude,int heartRate) {
+    public CSVDataBean(String id, String idDevice, String date, String time, float latitude, float longitude, float accX, float accY, float accZ,float pitch,float roll, int accident, int portent, String site, float altitude) {
         this.id = id;
         this.idDevice = idDevice;
         this.date = date;
@@ -23,13 +22,12 @@ public class CSVDataBean {
         this.accX = accX;
         this.accY = accY;
         this.accZ = accZ;
+        this.pitch = pitch;
+        this.roll = roll;
         this.accident = accident;
-        this.accidentAns = accidentAns;
         this.portent = portent;
-        this.portentAns = portentAns;
         this.site = site;
         this.altitude = altitude;
-        this.heartRate = heartRate;
     }
 
     public CSVDataBean(){
@@ -72,20 +70,20 @@ public class CSVDataBean {
         this.accZ = accZ;
     }
 
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
+    }
+
+    public void setRoll(float roll) {
+        this.roll = roll;
+    }
+
     public void setAccident(int accident) {
         this.accident = accident;
     }
 
-    public void setAccidentAns(int accidentAns) {
-        this.accidentAns = accidentAns;
-    }
-
     public void setPortent(int portent) {
         this.portent = portent;
-    }
-
-    public void setPortentAns(int portentAns) {
-        this.portentAns = portentAns;
     }
 
     public void setSite(String site) {
@@ -94,10 +92,6 @@ public class CSVDataBean {
 
     public void setAltitude(float altitude) {
         this.altitude = altitude;
-    }
-
-    public void setHeartRate(int heartRate) {
-        this.heartRate = heartRate;
     }
 
     public String getId() {
@@ -136,20 +130,20 @@ public class CSVDataBean {
         return accZ;
     }
 
+    public float getPitch() {
+        return pitch;
+    }
+
+    public float getRoll() {
+        return roll;
+    }
+
     public int getAccident() {
         return accident;
     }
 
-    public int getAccidentAns() {
-        return accidentAns;
-    }
-
     public int getPortent() {
         return portent;
-    }
-
-    public int getPortentAns() {
-        return portentAns;
     }
 
     public String getSite() {
@@ -160,7 +154,4 @@ public class CSVDataBean {
         return altitude;
     }
 
-    public int getHeartRate() {
-        return heartRate;
-    }
 }

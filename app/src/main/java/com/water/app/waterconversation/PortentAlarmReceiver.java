@@ -28,30 +28,30 @@ public class PortentAlarmReceiver extends Activity {
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-        //註冊Receiver來改變狀態
+    //註冊Receiver來改變狀態
 //        registerReceiver(mMessageReceiver, new IntentFilter(Constants.ACTION.ALARM_BY_BROADCAST));
 
-        //設定初始的警報聲以及喚醒螢幕
-        setupMedia_wakeLock();
+    //設定初始的警報聲以及喚醒螢幕
+    setupMedia_wakeLock();
 
-        //設定畫面
-        setContentView(R.layout.receiver_portent_alarm);
+    //設定畫面
+    setContentView(R.layout.receiver_portent_alarm);
 
-        //設定前兆畫面的title
-        textViewTitle = (TextView) findViewById(R.id.textView_alarm_portent_title);
-        textViewTitle.setTextSize(30);
+    //設定前兆畫面的title
+    textViewTitle = (TextView) findViewById(R.id.textView_alarm_portent_title);
+    textViewTitle.setTextSize(30);
 
-        //根據intent傳遞來的state來決定要顯示什麼文字
-        String textState = getIntent().getAction();
-        setAlarmText(textState);
+    //根據intent傳遞來的state來決定要顯示什麼文字
+    String textState = getIntent().getAction();
+    setAlarmText(textState);
 
-        //設定button 以及其按鈕事件
-        setupButton();
+    //設定button 以及其按鈕事件
+    setupButton();
 
-    }
+}
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
 
