@@ -113,18 +113,18 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
     //門檻值初始值
     private final float Threshold_Drop = 24;
     private final float Threshold_Fall = 19;
-    private final float Threshold_Coma = 0.7f;
+    private final float Threshold_Coma = 0.65f;
     private final float Threshold_Lost_Balance = 12;
 
     //給x,y,z初值
-    private float Xval,Yval,Zval,Pval,Rval= 0.0f;
-    private double mRoll, mPitch,SVMo,SVM,xv,yv,zv = 0.0;
+    private float Xval,Yval,Zval,Pval,Rval,yv,zv= 0.0f;
+    private double mRoll, mPitch = 0.0;
     private ArrayList<Float> dangerList = new ArrayList<Float>(); //0.5秒內的5個數值陣列
-    private ArrayList<Double> svmlist = new ArrayList<Double>(); //0.5秒內的5個數值陣列
-    private ArrayList<Double> ylist = new ArrayList<Double>(); //0.5秒內的5個數值陣列
-    private ArrayList<Double> zlist = new ArrayList<Double>(); //0.5秒內的5個數值陣列
+    private ArrayList<Float> svmlist = new ArrayList<Float>(); //0.5秒內的5個數值陣列
+    private ArrayList<Float> ylist = new ArrayList<Float>(); //0.5秒內的5個數值陣列
+    private ArrayList<Float> zlist = new ArrayList<Float>(); //0.5秒內的5個數值陣列
     private ArrayList<Integer> clist = new ArrayList<Integer>(); //0.5秒內的5個數值陣列
-    private List<Double> plist = new ArrayList<Double>(); //0.5秒內的5個數值陣列
+    private List<Float> plist = new ArrayList<Float>(); //0.5秒內的5個數值陣列
     private ArrayList<Float> portentList = new ArrayList<Float>(); //5分鐘內數值陣列
     private ArrayList<Float> portentSumList = new ArrayList<>();
     private ArrayList<CSVDataBean> csvDataBeanArrayList = new ArrayList<CSVDataBean>();
@@ -411,7 +411,6 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
             //這次的值減掉上次的值，才是加速度
 //            x = event.values[0] - Xval;
             Xval = event.values[0];
-            xv=Xval;
 //            y = event.values[1] - Yval;
             Yval = event.values[1];
             yv = Yval;
@@ -469,8 +468,8 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
 //        judgePortents(svmVal);
     }
     public void calculateSVM (float x,float y, float z){
-        double svmSqaure = (x*x)+(y*y)+(z*z);
-        double SVM =(double) Math.pow(svmSqaure,0.5);
+        float svmSqaure = (x*x)+(y*y)+(z*z);
+        float SVM =(float) Math.pow(svmSqaure,0.5);
         tense(SVM);
     }
     /*
@@ -485,7 +484,7 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
      * 判斷危險是否要發出警報(墜落、跌倒、昏迷)
      * @param
      */
-    private void tense(double SVM) {
+    private void tense(float SVM) {
         //陣列保持10個數值在裡面 (保留1秒間的數值)
         if (ylist.size() < 10) {
             ylist.add(yv);
@@ -510,7 +509,7 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
             plist.addAll(zlist);
             plist.addAll(svmlist);
             Log.e(TAG, "plist成功");
-            Integer prediction = doInference(plist);
+            Integer prediction =(int) doInference(plist);
             plist.clear();
             if (clist.size() < 10) {
                 clist.add(prediction);
@@ -523,35 +522,36 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
             return;
         }
     }
-/*
-    private double[] toDArray(List<Double> plist) {
+    private float doInference(List<Float> plist) {
+
+        float[][][] inputval = new float[1][3][10];
+        float[][] outputval = new float[1][3];
+
         int m = 0;
-        double[] a = new double[plist.size()];
-        for (Double d : plist) {
-            a[m++] = (d != null ? d : Double.NaN);
-        }
-        return a;
-    }
-*/
-    private Integer doInference(List<Double> plist) {
-
-        double[][][] inputval = new double[1][3][10];
-        Integer []outputval = new Integer[3];
-
-        int m =0;
-        for (int i = 0; i<1; i++){
-            for (int j = 0; j<3; j++){
-                for (int k = 0; k<10; k++){
-                    double ar = plist[m++];
-                    inputval[i][j][k]=ar;
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 3; j++) {
+                for (int k = 0; k < 10; k++) {
+                    float ar = plist.get(m++);
+                    inputval[i][j][k] = ar;
                 }
             }
         }
 
-        tflite.run(inputval,outputval);
+        tflite.run(inputval, outputval);
 
-        Integer inferredValue = outputval[0];
-        return inferredValue;
+        float iii = outputval[0][0];
+        float jjj = outputval[0][1];
+        float kkk = outputval[0][2];
+        Integer ans = 0;
+
+        if(jjj > iii+kkk){
+            ans = 1;
+        }if(kkk > iii+jjj ){
+            ans = 2;
+        }
+
+        Log.d(TAG,"ans="+ans);
+        return ans;
     }
 
     private MappedByteBuffer loadModelFile() throws IOException{
@@ -568,19 +568,19 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
 
         for (int i= 1 ; i < clist.size(); i++){
             if (clist.get(i) == 1){
-                fall_count++;
-            }
-            if (clist.get(i) == 2){
                 drop_count++;
             }
+            if (clist.get(i) == 2){
+                fall_count++;
+            }
         }
-        if(fall_count>5){
-            alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_FALL); //墜落
+        if(fall_count>6){
+            alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_FALL); //跌倒
             saveData(Constants.ACTION.ALARM_ACCIDENTS_FALL);
             fall_count=0;
         }
-        if (drop_count>5){
-            alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_DROP); //跌倒
+        if (drop_count>6){
+            alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_DROP); //墜落
             saveData(Constants.ACTION.ALARM_ACCIDENTS_DROP);
             drop_count=0;
         }
@@ -617,9 +617,9 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
         } else count_coma = 0;
 
         if (count_coma >= comatime) {
-            alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_COMA);//昏迷
+            alarmAccidents(Constants.ACTION.ALARM_ASK);//昏迷
         }
-        if (count_coma >= comatime+600) {
+        if (count_coma >= comatime+3000) {
             count_coma = 0;
             alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_COMA);//昏迷
             saveData(Constants.ACTION.ALARM_ACCIDENTS_COMA);

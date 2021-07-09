@@ -24,6 +24,7 @@ import com.water.app.waterconversation.Service.ForeService;
 public class AlarmReceiver extends Activity {
 
     private String TAG = "AlarmReceiver";
+    private Integer c;
 
 
 
@@ -147,11 +148,11 @@ public class AlarmReceiver extends Activity {
                     //更新為詢問UI
                 case Constants.ACTION.ALARM_ASK:
                     textViewTitle.setTextColor(getResources().getColor(R.color.color_coma));
-                    textViewTitle.setText(R.string.coma);
+                    textViewTitle.setText(R.string.normal);
                     button1.setTextColor(getResources().getColor(R.color.color_drop));
-                    button1.setText(R.string.normal);
+                    button1.setText(R.string.nodis30);
                     button2.setTextColor(getResources().getColor(R.color.color_fall));
-                    button2.setText(R.string.nodis);
+                    button2.setText(R.string.nodis60);
                     globalVariable.setAccidentAlarming(true);
                     globalVariable.setAlarmAccident(Constants.ACCIDENTS.ASK);
                     globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.ASK);
@@ -310,7 +311,10 @@ public class AlarmReceiver extends Activity {
                         globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.DROP);
                         break;
                     case Constants.ACCIDENTS.ASK:
-                        globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.COMA);
+                        globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.NORMAL);
+                        pauseService();
+                        setCount();
+                        c = 60;
                         break;
                     case Constants.ACCIDENTS.COMA:
                         globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.DROP);
@@ -358,6 +362,7 @@ public class AlarmReceiver extends Activity {
                     case Constants.ACCIDENTS.ASK:
                         globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.NORMAL);
                         pauseService();
+                        c = 30;
                         setCount();
                         break;
                     case Constants.ACCIDENTS.COMA:
@@ -391,18 +396,33 @@ public class AlarmReceiver extends Activity {
     }
 
     private void setCount() {
-        CountDownTimer c = new CountDownTimer(3600000,1800000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                Toast.makeText(getApplicationContext(), "倒數30分", Toast.LENGTH_SHORT).show();
-            }
+        if (c == 30) {
+            CountDownTimer c = new CountDownTimer(3600000, 3000000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    Toast.makeText(getApplicationContext(), "倒數10分", Toast.LENGTH_SHORT).show();
+                }
 
-            @Override
-            public void onFinish() {
-                startForeService();
-            }
-        };
+                @Override
+                public void onFinish() {
+                    startForeService();
+                }
+            };
+        } else {
+            CountDownTimer c = new CountDownTimer(1800000, 1500000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    Toast.makeText(getApplicationContext(), "倒數5分", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFinish() {
+                    startForeService();
+                }
+            };
+        }
     }
+
 
     private void pauseService() {
         Intent serviceIntent = new Intent(this.getApplicationContext(), ForeService.class);

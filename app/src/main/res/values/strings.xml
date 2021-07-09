@@ -128,7 +128,8 @@
     <string name="fall">跌倒</string>
     <string name="coma">昏迷</string>
     <string name="normal">沒事</string>
-    <string name="nodis">勿擾</string>
+    <string name="nodis30">勿擾(30分)</string>
+    <string name="nodis60">勿擾(1小時)</string>
     <string name="lost_balance">失去平衡</string>
     <string name="heavy_step">突然重踩</string>
     <string name="suddenly_wobbing">突然晃動</string>

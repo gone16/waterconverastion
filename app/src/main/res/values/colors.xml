@@ -10,7 +10,7 @@
     <color name="color_stop_detect">#f44336</color>
     <color name="color_start_detect">#009688</color>
 
-    <color name="color_drop">#FFFFFF</color>
+    <color name="color_drop">#f44336</color>
     <color name="color_fall">#ff6e40</color>
     <color name="color_coma">#ffab91</color>
     <color name="color_lost_balance">#3949ab</color>
