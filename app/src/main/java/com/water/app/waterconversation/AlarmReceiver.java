@@ -397,7 +397,7 @@ public class AlarmReceiver extends Activity {
 
     private void setCount() {
         if (c == 60) {
-            CountDownTimer c = new CountDownTimer(3600000, 3000000) {
+            new CountDownTimer(3600000, 3000000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     Toast.makeText(getApplicationContext(), "倒數10分", Toast.LENGTH_SHORT).show();
@@ -407,19 +407,18 @@ public class AlarmReceiver extends Activity {
                 public void onFinish() {
                     startForeService();
                 }
-            };
-        } else {
-            CountDownTimer c = new CountDownTimer(1800000, 1500000) {
+            }.start();
+        } if(c == 30) {
+            new CountDownTimer(1800000, 1500000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     Toast.makeText(getApplicationContext(), "倒數5分", Toast.LENGTH_SHORT).show();
                 }
-
                 @Override
                 public void onFinish() {
                     startForeService();
                 }
-            };
+            }.start();
         }
     }
 
