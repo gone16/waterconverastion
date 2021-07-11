@@ -266,8 +266,6 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
                 globalVariable.setDetecting(false);
                 Toast.makeText(this, "發生錯誤，暫停偵測", Toast.LENGTH_SHORT).show();
                 handler.removeCallbacksAndMessages(null);  //移除執行緒
-//            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, (LocationListener) this); //停止gps偵測
-//            if(googleApiClient != null)  googleApiClient.disconnect(); //與google api斷開
                 stopForeground(true); //停止前景服務
                 stopSelf(); //移除本身
                 Log.e(TAG, "onStartCommand: ", e);
@@ -452,8 +450,7 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
                 mRoll = roll;
                 Pval = orientation[1];
                 Rval = orientation[2];
-                //calculateSVMo(Pval,Rval);
-                //SVMo = Math.pow(Pval*Pval+Rval*Rval,0.5);
+                //SVMo = (float) Math.pow(Pval*Pval+Rval*Rval,0.5);
             }
         }
     }
@@ -522,14 +519,13 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
         //將前面陣列變更為符合inputshape之形狀
         int m = 0;
         for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 3; j++) {
+            for (int j = 0; j < 2; j++) {
                 for (int k = 0; k < 10; k++) {
                     float ar = plist.get(m++);
                     inputval[i][j][k] = ar;
                 }
             }
         }
-
         tflite.run(inputval, outputval); //進行分析
 
         //輸出機率
@@ -537,6 +533,7 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
         float jjj = outputval[0][1]; //墜落
         float kkk = outputval[0][2]; //跌倒
         Integer ans = 0;
+        Log.d(TAG,"float="+iii);
 
         //墜落可能性大於跌倒與安全
         if(jjj > iii && jjj > kkk){
@@ -569,13 +566,14 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
             if (clist.get(i) == 2){
                 fall_count++;
             }
+            Log.e(TAG,"dropcount"+fall_count);
         }
         if (drop_count>6){
             alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_DROP); //墜落
             saveData(Constants.ACTION.ALARM_ACCIDENTS_DROP);
             drop_count=0;
         }
-        if(fall_count>6){
+        if(fall_count>5){
             alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_FALL); //跌倒
             saveData(Constants.ACTION.ALARM_ACCIDENTS_FALL);
             fall_count=0;
