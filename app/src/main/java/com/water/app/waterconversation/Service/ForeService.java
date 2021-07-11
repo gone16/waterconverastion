@@ -472,18 +472,8 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
         float SVM =(float) Math.pow(svmSqaure,0.5);
         tense(SVM);
     }
-    /*
-    public void calculateSVMo (float x,float y){
-        float svmSqaure = (x*x)+(y*y);
-        double SVMo =(Double) Math.pow(svmSqaure,0.5);
-        tense(SVMo);
-    }
-     */
 
-    /**
-     * 判斷危險是否要發出警報(墜落、跌倒、昏迷)
-     * @param
-     */
+    //建立丟入模型的shape
     private void tense(float SVM) {
         //陣列保持10個數值在裡面 (保留1秒間的數值)
         if (ylist.size() < 10) {
@@ -504,29 +494,32 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
             svmlist.remove(0);
             svmlist.add(SVM);
         }
+        //添加y,z,svm數值進list
         if (ylist.size() == 10 && zlist.size() == 10 && svmlist.size() == 10) {
             plist.addAll(ylist);
             plist.addAll(zlist);
             plist.addAll(svmlist);
-            Log.e(TAG, "plist成功");
-            Integer prediction =(int) doInference(plist);
+            Integer prediction =(int) doInference(plist);//進行判斷
             plist.clear();
+            //階層門檻
             if (clist.size() < 10) {
-                clist.add(prediction);
+                clist.add(prediction);//添加預測值進行判斷
             } else {
                 clist.remove(0);
                 clist.add(prediction);
-                judgeD(clist);
+                judgeD(clist);//進行判斷
             }
         } else {
             return;
         }
     }
+    //進行判斷
     private float doInference(List<Float> plist) {
 
-        float[][][] inputval = new float[1][3][10];
-        float[][] outputval = new float[1][3];
+        float[][][] inputval = new float[1][3][10]; //Inputshape
+        float[][] outputval = new float[1][3]; //outputsape
 
+        //將前面陣列變更為符合inputshape之形狀
         int m = 0;
         for (int i = 0; i < 1; i++) {
             for (int j = 0; j < 3; j++) {
@@ -537,23 +530,26 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
             }
         }
 
-        tflite.run(inputval, outputval);
+        tflite.run(inputval, outputval); //進行分析
 
-        float iii = outputval[0][0];
-        float jjj = outputval[0][1];
-        float kkk = outputval[0][2];
+        //輸出機率
+        float iii = outputval[0][0]; //安全機率
+        float jjj = outputval[0][1]; //墜落
+        float kkk = outputval[0][2]; //跌倒
         Integer ans = 0;
 
-        if(jjj > iii+kkk){
+        //墜落可能性大於跌倒與安全
+        if(jjj > iii && jjj > kkk){
             ans = 1;
-        }if(kkk > iii+jjj ){
+        //跌倒可能性大於墜落與安全
+        }if(kkk > iii && kkk > jjj ){
             ans = 2;
         }
-
         Log.d(TAG,"ans="+ans);
         return ans;
     }
 
+    //讀取導入模型
     private MappedByteBuffer loadModelFile() throws IOException{
         AssetFileDescriptor fileDescriptor = this.getAssets().openFd("cmodel.tflite");
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
@@ -561,9 +557,9 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
         long startOffset = fileDescriptor.getStartOffset();
         long declaredLength = fileDescriptor.getDeclaredLength();
         return fileChannel.map(FileChannel.MapMode.READ_ONLY,startOffset,declaredLength);
-
     }
 
+    //進行階層門檻判斷
     private void judgeD(ArrayList<Integer> clist) {
 
         for (int i= 1 ; i < clist.size(); i++){
@@ -574,15 +570,15 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
                 fall_count++;
             }
         }
-        if(fall_count>6){
-            alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_FALL); //跌倒
-            saveData(Constants.ACTION.ALARM_ACCIDENTS_FALL);
-            fall_count=0;
-        }
         if (drop_count>6){
             alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_DROP); //墜落
             saveData(Constants.ACTION.ALARM_ACCIDENTS_DROP);
             drop_count=0;
+        }
+        if(fall_count>6){
+            alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_FALL); //跌倒
+            saveData(Constants.ACTION.ALARM_ACCIDENTS_FALL);
+            fall_count=0;
         }
         if(fall_count+drop_count==0){
             saveData("normal");
@@ -592,13 +588,11 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
             fall_count=0;
         }
     }
-
+    //判斷昏迷
     private void judgeDanger(float svmVal) {
 
-        GlobalVariable globalVariable = (GlobalVariable) getApplicationContext();
-
         //陣列保持五個數值在裡面 (保留0.5秒間的數值)
-        if (dangerList.size() < 5) {
+        if (dangerList.size() < 10) {
             dangerList.add(svmVal);
         } else {
             dangerList.remove(0);
@@ -606,11 +600,11 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
         }
         //算出0.5秒間的平均值
         float svmVal_sum = 0.0f;
-        if (dangerList.size() < 5) return;
-        for (int i = 0; i < 5; i++) {
+        if (dangerList.size() < 10) return;
+        for (int i = 0; i < 10; i++) {
             svmVal_sum = svmVal_sum + dangerList.get(i);
         }
-        float svmVal_average = svmVal_sum / 5;
+        float svmVal_average = svmVal_sum / 10;
 
         if (svmVal_average < Threshold_Coma + sensitivityComa && Math.pow((mRoll * mRoll + mPitch * mPitch), 0.5) > 5) {
             count_coma++;

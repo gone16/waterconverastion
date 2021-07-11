@@ -396,7 +396,7 @@ public class AlarmReceiver extends Activity {
     }
 
     private void setCount() {
-        if (c == 30) {
+        if (c == 60) {
             CountDownTimer c = new CountDownTimer(3600000, 3000000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
