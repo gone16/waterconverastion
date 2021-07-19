@@ -117,8 +117,9 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
     private final float Threshold_Lost_Balance = 12;
 
     //給x,y,z初值
-    private float Xval,Yval,Zval,Pval,Rval,yv,zv= 0.0f;
+    private float Xval,Yval,Zval,Pval,Rval,yv,zv,SVMo,SVM= 0.0f;
     private double mRoll, mPitch = 0.0;
+    private int count;
     private ArrayList<Float> dangerList = new ArrayList<Float>(); //0.5秒內的5個數值陣列
     private ArrayList<Float> svmlist = new ArrayList<Float>(); //0.5秒內的5個數值陣列
     private ArrayList<Float> ylist = new ArrayList<Float>(); //0.5秒內的5個數值陣列
@@ -141,6 +142,7 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
     private int count_receive = 0;
     private int count_mstart = 0;
     private int csvtime = 300*60;
+    private int arraysize = 20; //y,z,svm的矩陣常數
     private int firebaseListChanger =0;
     private final double firebasetime = 0.1;
 
@@ -422,6 +424,7 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
             }
             mAccelerometer = event.values;
             //取得演算法結果
+            SVM =(float) Math.pow(Xval*Xval+Yval*Yval+Zval*Zval,0.5);
             calculateAlgos(Xval, Yval, Zval);
             calculateSVM(Xval, Yval, Zval);
 
@@ -450,7 +453,7 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
                 mRoll = roll;
                 Pval = orientation[1];
                 Rval = orientation[2];
-                //SVMo = (float) Math.pow(Pval*Pval+Rval*Rval,0.5);
+                SVMo = (float) Math.pow(Pval*Pval+Rval*Rval,0.5);
             }
         }
     }
@@ -466,33 +469,33 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
     }
     public void calculateSVM (float x,float y, float z){
         float svmSqaure = (x*x)+(y*y)+(z*z);
-        float SVM =(float) Math.pow(svmSqaure,0.5);
+        SVM =(float) Math.pow(svmSqaure,0.5);
         tense(SVM);
     }
 
     //建立丟入模型的shape
     private void tense(float SVM) {
         //陣列保持10個數值在裡面 (保留1秒間的數值)
-        if (ylist.size() < 10) {
+        if (ylist.size() < arraysize) { //arraysize改為常數，如果之後要更改從上面改全部的就好
             ylist.add(yv);
         } else {
             ylist.remove(0);
             ylist.add(yv);
         }
-        if (zlist.size() < 10) {
+        if (zlist.size() < arraysize) {
             zlist.add(zv);
         } else {
             zlist.remove(0);
             zlist.add(zv);
         }
-        if (svmlist.size() < 10) {
+        if (svmlist.size() < arraysize) {
             svmlist.add(SVM);
         } else {
             svmlist.remove(0);
             svmlist.add(SVM);
         }
         //添加y,z,svm數值進list
-        if (ylist.size() == 10 && zlist.size() == 10 && svmlist.size() == 10) {
+        if (ylist.size() == arraysize && zlist.size() == arraysize && svmlist.size() == arraysize) {
             plist.addAll(ylist);
             plist.addAll(zlist);
             plist.addAll(svmlist);
@@ -513,14 +516,14 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
     //進行判斷
     private float doInference(List<Float> plist) {
 
-        float[][][] inputval = new float[1][3][10]; //Inputshape
+        float[][][] inputval = new float[1][3][20]; //Inputshape
         float[][] outputval = new float[1][3]; //outputsape
 
         //將前面陣列變更為符合inputshape之形狀
         int m = 0;
         for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 2; j++) {
-                for (int k = 0; k < 10; k++) {
+            for (int j = 0; j < 3; j++) {
+                for (int k = 0; k < 20; k++) {
                     float ar = plist.get(m++);
                     inputval[i][j][k] = ar;
                 }
@@ -533,7 +536,9 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
         float jjj = outputval[0][1]; //墜落
         float kkk = outputval[0][2]; //跌倒
         Integer ans = 0;
-        Log.d(TAG,"float="+iii);
+        Log.d(TAG,"float0="+iii);
+        Log.d(TAG,"float1="+jjj);
+        Log.d(TAG,"float2="+kkk);
 
         //墜落可能性大於跌倒與安全
         if(jjj > iii && jjj > kkk){
@@ -542,13 +547,14 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
         }if(kkk > iii && kkk > jjj ){
             ans = 2;
         }
+        count = ans;
         Log.d(TAG,"ans="+ans);
         return ans;
     }
 
     //讀取導入模型
     private MappedByteBuffer loadModelFile() throws IOException{
-        AssetFileDescriptor fileDescriptor = this.getAssets().openFd("cmodel.tflite");
+        AssetFileDescriptor fileDescriptor = this.getAssets().openFd("cmodel(1).tflite");
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
         FileChannel fileChannel = inputStream.getChannel();
         long startOffset = fileDescriptor.getStartOffset();
@@ -559,14 +565,14 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
     //進行階層門檻判斷
     private void judgeD(ArrayList<Integer> clist) {
 
-        for (int i= 1 ; i < clist.size(); i++){
+        for (int i= 1 ; i < clist.size(); i++){   //clist維持10個矩陣
             if (clist.get(i) == 1){
                 drop_count++;
             }
             if (clist.get(i) == 2){
                 fall_count++;
+                Log.d(TAG,"ansf="+fall_count);
             }
-            Log.e(TAG,"dropcount"+fall_count);
         }
         if (drop_count>6){
             alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_DROP); //墜落
@@ -1005,27 +1011,26 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
     //決定關鍵數據(accident, accidentAns, portent, portentAns)
     private void saveDataState(int accident, int portent) {
         if (Site.equals(null) || UserId.equals(null)) return;
-        saveCsv(UserId, getCurrentDate(), getCurrentTime(), Xval, Yval, Zval,Pval,Rval, accident,longitude,latitude,altitude);
+        saveCsv(getCurrentDate(), getCurrentTime(), Xval, Yval, Zval,Pval,Rval,SVM,SVMo,count,accident);
         //saveFireBase(UserId, DeviceId, getCurrentDate(), getCurrentTime(), latitude, longitude, x, y, z, accident,portent, Site, altitude,heartRate, gettoken(), getMachine(), getMachineName(), getReceiveAns());
     }
      //將csvList存入.csv檔
-     private void saveCsv(String id, String date, String time, float accX, float accY, float accZ,float pitch,float roll, int accident, float longitude,float latitude,float altitude){
+     private void saveCsv(String date, String time, float accX, float accY, float accZ,float pitch,float roll,float SVM,float SVMo, int count, int accident){
         CSVDataBean apacheBean = new CSVDataBean();
-        apacheBean.setId(id);
-        //apacheBean.setIdDevice(idDevice);
         apacheBean.setDate(date);
         apacheBean.setTime(time);
         apacheBean.setAccX(accX);
         apacheBean.setAccY(accY);
         apacheBean.setAccZ(accZ);
-        apacheBean.setPitch(pitch);
-        apacheBean.setRoll(roll);
+        //apacheBean.setPitch(pitch);
+        //apacheBean.setRoll(roll);
+        apacheBean.setSVM(SVM);
+        apacheBean.setSVMo(SVMo);
+        apacheBean.setCount(count);
         apacheBean.setAccident(accident);
-        apacheBean.setLongitude(longitude);
-        apacheBean.setLatitude(latitude);
         //apacheBean.setPortent(portent);
         //apacheBean.setSite(site);
-        apacheBean.setAltitude(altitude);
+        //apacheBean.setAltitude(altitude);
             if(csvListChanger == 0){
                 csvDataBeanArrayList.add(apacheBean);
 //            Log.d(TAG, "saveCsvList1:" +csvDataBeanArrayList.size() );
@@ -1055,26 +1060,29 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
 //           Log.d(TAG, "writeCsv: "+this.getFilesDir().getAbsolutePath());
              BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
 
-             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("id", "date", "time","accX","accY","accZ","pitch","roll","accident","longitude","latitude","altitude"));
+             CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader("date", "time","accX","accY","accZ","SVM","SVMo","count","accident"));
 
 
              for (int i = 0; i < mList.size(); i++) {
                  csvPrinter.printRecord(
-                         mList.get(i).getId(),
+                         //mList.get(i).getId(),
                          //mList.get(i).getIdDevice(),
                          mList.get(i).getDate(),
                          mList.get(i).getTime(),
                          mList.get(i).getAccX(),
                          mList.get(i).getAccY(),
                          mList.get(i).getAccZ(),
-                         mList.get(i).getPitch(),
-                         mList.get(i).getRoll(),
-                         mList.get(i).getAccident(),
-                         mList.get(i).getLongitude(),
-                         mList.get(i).getLatitude(),
+                         //mList.get(i).getPitch(),
+                         //mList.get(i).getRoll(),
+                         mList.get(i).getSVM(),
+                         mList.get(i).getSVMo(),
+                         mList.get(i).getCount(),
+                         mList.get(i).getAccident());
+                         //mList.get(i).getLongitude(),
+                         //mList.get(i).getLatitude(),
                          //mList.get(i).getPortent(),
                          //mList.get(i).getSite(),
-                         mList.get(i).getAltitude());
+                         //mList.get(i).getAltitude());
                 }
                 csvPrinter.printRecord();
                 csvPrinter.flush();

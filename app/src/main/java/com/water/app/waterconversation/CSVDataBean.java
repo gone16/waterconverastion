@@ -7,12 +7,12 @@ public class CSVDataBean {
     public String time;
     public float latitude;
     public float longitude;
-    public float accX,accY,accZ,pitch,roll;
-    public int accident,portent;
+    public float accX,accY,accZ,pitch,roll,SVMo,SVM;
+    public int accident,portent,count;
     public String site;
     public float altitude;
 
-    public CSVDataBean(String id, String idDevice, String date, String time, float latitude, float longitude, float accX, float accY, float accZ,float pitch,float roll, int accident, int portent, String site, float altitude) {
+    public CSVDataBean(String id, String idDevice, String date, String time, float latitude, float longitude, float accX, float accY, float accZ,float pitch,float roll, int accident, int count, int portent, String site, float altitude, float SVM, float SVMo) {
         this.id = id;
         this.idDevice = idDevice;
         this.date = date;
@@ -24,6 +24,9 @@ public class CSVDataBean {
         this.accZ = accZ;
         this.pitch = pitch;
         this.roll = roll;
+        this.SVMo = SVMo;
+        this.SVM = SVM;
+        this.count =count;
         this.accident = accident;
         this.portent = portent;
         this.site = site;
@@ -78,8 +81,20 @@ public class CSVDataBean {
         this.roll = roll;
     }
 
+    public void setSVMo(float SVMo) {
+        this.SVMo = SVMo;
+    }
+
+    public void setSVM(float SVM) {
+        this.SVM = SVM;
+    }
+
     public void setAccident(int accident) {
         this.accident = accident;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 
     public void setPortent(int portent) {
@@ -134,12 +149,18 @@ public class CSVDataBean {
         return pitch;
     }
 
-    public float getRoll() {
-        return roll;
-    }
+    public float getRoll() { return roll; }
+
+    public float getSVMo() { return SVMo;}
+
+    public float getSVM() { return SVM;}
 
     public int getAccident() {
         return accident;
+    }
+
+    public int getCount() {
+        return count;
     }
 
     public int getPortent() {
