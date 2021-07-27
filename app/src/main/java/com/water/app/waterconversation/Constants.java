@@ -43,6 +43,7 @@ public class Constants {
         int DROP = 8;
         int COMA = 9 ;
         int ASK = 10 ;
+        int BREAK = 11;
         //int TIMES_UP = 7;
     }
 

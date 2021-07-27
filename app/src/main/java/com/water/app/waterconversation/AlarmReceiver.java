@@ -311,7 +311,7 @@ public class AlarmReceiver extends Activity {
                         globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.DROP);
                         break;
                     case Constants.ACCIDENTS.ASK:
-                        globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.NORMAL);
+                        globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.BREAK);
                         pauseService();
                         setCount();
                         c = 60;
@@ -360,7 +360,7 @@ public class AlarmReceiver extends Activity {
                         globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.COMA);
                         break;
                     case Constants.ACCIDENTS.ASK:
-                        globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.NORMAL);
+                        globalVariable.setAlarmAccidentAnswer(Constants.ACCIDENTS.BREAK);
                         pauseService();
                         c = 30;
                         setCount();

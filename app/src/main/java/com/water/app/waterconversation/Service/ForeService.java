@@ -113,7 +113,7 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
     //門檻值初始值
     private final float Threshold_Drop = 24;
     private final float Threshold_Fall = 19;
-    private final float Threshold_Coma = 0.5f;
+    private final float Threshold_Coma = 0.1f;
     private final float Threshold_Lost_Balance = 12;
 
     //給x,y,z初值
@@ -149,9 +149,7 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
     private int drop_count = 0;
     private int fall_count = 0;
 
-    private int comatime = 1200;
-
-    private int heartRate = 60;
+    private int comatime = 1000;
 
     private DatabaseReference mDatabase;
 
@@ -608,82 +606,22 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
         }
         float svmVal_average = svmVal_sum / 10;
 
-        if (svmVal_average < Threshold_Coma + sensitivityComa && Math.pow((mRoll * mRoll + mPitch * mPitch), 0.5) > 5) {
+        if (svmVal_average < Threshold_Coma + sensitivityComa) {
             count_coma++;
         } else count_coma = 0;
         count=count_coma;
+        Log.d(TAG,"coma"+Threshold_Coma + sensitivityComa);
         if (count_coma >= comatime) {
             alarmAccidents(Constants.ACTION.ALARM_ASK);//昏迷
+            count_coma++;
         }
-        if (count_coma >= comatime+1200) {
+        if (count_coma >= comatime+300) {
             count_coma = 0;
             alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_COMA);//昏迷
             saveData(Constants.ACTION.ALARM_ACCIDENTS_COMA);
             saveDataBase(Constants.ACTION.ALARM_ACCIDENTS_COMA, svmd);
         }
     }
-/*
-        //超過門檻值或小於門檻值之判斷
-        if(svmVal_average>Threshold_Drop + sensitivityDrop){
-            alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_DROP); //墜落
-            saveData(Constants.ACTION.ALARM_ACCIDENTS_DROP);
-            if(drop_count==0){
-                saveDataBase(Constants.ACTION.ALARM_ACCIDENTS_DROP,svm);
-            }
-            drop_count++;
-            if (drop_count>5){
-                drop_count=0;
-            }
-            danger = true;
-
-        }else if(svmVal_average>Threshold_Fall + sensitivityFall){
-            alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_FALL); //跌倒
-            saveData(Constants.ACTION.ALARM_ACCIDENTS_FALL);
-            if(fall_count==0){
-                saveDataBase(Constants.ACTION.ALARM_ACCIDENTS_FALL,svm);
-            }
-            fall_count++;
-            if (fall_count>5){
-                fall_count=0;
-            }
-            danger = true;
-
-        }else if(svmVal_average > Threshold_Lost_Balance + sensitivityPortent){
-            int randomPortent = (int)(Math.random()*3+1);
-            switch (randomPortent){
-                case Constants.PORTENTS.LOST_BALANCE:
-                    alarmPortents(Constants.ACTION.ALARM_PORTENTS_LOST_BALALNCE); //失去平衡(危險前兆)
-                    saveData(Constants.ACTION.ALARM_PORTENTS_LOST_BALALNCE);
-                    saveDataBase(Constants.ACTION.ALARM_PORTENTS_LOST_BALALNCE,svm);
-                    break;
-                case Constants.PORTENTS.HEAVY_STEP:
-                    alarmPortents(Constants.ACTION.ALARM_PORTENTS_HEAVY_STEP); //突然重踩(危險前兆)
-                    saveData(Constants.ACTION.ALARM_PORTENTS_HEAVY_STEP);
-                    saveDataBase(Constants.ACTION.ALARM_PORTENTS_HEAVY_STEP,svm);
-                    break;
-                case Constants.PORTENTS.SUDDENLY_WOBBING:
-                    alarmPortents(Constants.ACTION.ALARM_PORTENTS_SUDDENLY_WOBBING); //突然晃動(危險前兆)
-                    saveData(Constants.ACTION.ALARM_PORTENTS_SUDDENLY_WOBBING);
-                    saveDataBase(Constants.ACTION.ALARM_PORTENTS_SUDDENLY_WOBBING,svm);
-                    break;
-            }
-            danger = true;
-        }
-        else if(svmVal_average<Threshold_Coma + sensitivityComa && Math.pow((mRoll*mRoll + mPitch*mPitch),0.5) >5 ){
-            count_coma++;
-        }else count_coma=0;
-
-        if(count_coma>=comatime){
-            count_coma =0;
-            alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_COMA);//昏迷
-            saveData(Constants.ACTION.ALARM_ACCIDENTS_COMA);
-            saveDataBase(Constants.ACTION.ALARM_ACCIDENTS_COMA,svm);
-            danger = true;
-        }
-        if(!danger) saveData("normal");
-    }
-
- */
 
     //用3000筆資料做比對
     private void judgePortents(float svm){
@@ -922,6 +860,29 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
                     saveDataState(Constants.ACCIDENTS.COMA,Constants.PORTENTS.NORMAL);
                 }
                 count_accident++;
+                break;
+
+            //昏迷時存的資料
+            case Constants.ACTION.ALARM_ASK:
+
+                //回應"沒事"時，存全部正常的資料
+                if(globalVariable.getOK()) {
+                    saveDataState(Constants.ACCIDENTS.NORMAL,Constants.PORTENTS.NORMAL);
+                }
+                //正在警報的話，存正常資料
+                else if(globalVariable.getAlarming()) {
+                    saveDataState(Constants.ACCIDENTS.NORMAL,Constants.PORTENTS.NORMAL);
+                    count_coma = 0;
+                }
+                //回應休息，則存ans為休息
+                else if(globalVariable.getAlarmAccidentAnswer() == Constants.ACCIDENTS.BREAK){
+                    saveDataState(Constants.ACCIDENTS.BREAK,Constants.PORTENTS.NORMAL);
+                    count_coma = 0;
+                }
+                else {
+                    saveDataState(Constants.ACCIDENTS.NORMAL,Constants.PORTENTS.NORMAL);
+                    count_coma = 0;
+                }
                 break;
 
             //突然失去平衡的資料
