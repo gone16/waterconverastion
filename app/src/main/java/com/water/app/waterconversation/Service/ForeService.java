@@ -113,11 +113,11 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
     //門檻值初始值
     private final float Threshold_Drop = 24;
     private final float Threshold_Fall = 19;
-    private final float Threshold_Coma = 0.65f;
+    private final float Threshold_Coma = 0.5f;
     private final float Threshold_Lost_Balance = 12;
 
     //給x,y,z初值
-    private float Xval,Yval,Zval,Pval,Rval,yv,zv,SVMo,SVM= 0.0f;
+    private float Xval,Yval,Zval,Pval,Rval,yv,zv,SVMo,SVM,svmi= 0.0f;
     private double mRoll, mPitch = 0.0;
     private int count;
     private ArrayList<Float> dangerList = new ArrayList<Float>(); //0.5秒內的5個數值陣列
@@ -146,9 +146,10 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
     private int firebaseListChanger =0;
     private final double firebasetime = 0.1;
 
-    private int drop_count, fall_count = 0;
+    private int drop_count = 0;
+    private int fall_count = 0;
 
-    private int comatime = 600;
+    private int comatime = 1200;
 
     private int heartRate = 60;
 
@@ -409,12 +410,9 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
             LastUpdateTime = CurrentUpdateTime;
 
             //這次的值減掉上次的值，才是加速度
-//            x = event.values[0] - Xval;
             Xval = event.values[0];
-//            y = event.values[1] - Yval;
             Yval = event.values[1];
             yv = Yval;
-//            z = event.values[2] - Zval;
             Zval = event.values[2];
             zv = Zval;
             //第一個值不準確，跳過
@@ -461,11 +459,14 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
+
+    //變更為計算兩筆SVM差值
     public void calculateAlgos (float x,float y, float z){
         float svmSqaure = (x*x)+(y*y)+(z*z);
-        float svmVal = (float) Math.pow(svmSqaure,0.5)-9.8f;
-          judgeDanger(svmVal);
-//        judgePortents(svmVal);
+        float svmVal = (float) Math.pow(svmSqaure,0.5); //計算該秒SVM
+        float svmd = (float) Math.abs(svmVal-svmi);//計算與前一筆SVM差值
+        svmi = svmVal;//變為前一筆SVM
+        judgeDanger(svmd);
     }
     public void calculateSVM (float x,float y, float z){
         float svmSqaure = (x*x)+(y*y)+(z*z);
@@ -501,18 +502,12 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
             plist.addAll(svmlist);
             Integer prediction =(int) doInference(plist);//進行判斷
             plist.clear();
-            //階層門檻
-            if (clist.size() < 10) {
-                clist.add(prediction);//添加預測值進行判斷
-            } else {
-                clist.remove(0);
-                clist.add(prediction);
-                judgeD(clist);//進行判斷
-            }
+            judgeD(prediction);//階層門檻
         } else {
             return;
         }
     }
+
     //進行判斷
     private float doInference(List<Float> plist) {
 
@@ -536,9 +531,6 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
         float jjj = outputval[0][1]; //墜落
         float kkk = outputval[0][2]; //跌倒
         Integer ans = 0;
-        Log.d(TAG,"float0="+iii);
-        Log.d(TAG,"float1="+jjj);
-        Log.d(TAG,"float2="+kkk);
 
         //墜落可能性大於跌倒與安全
         if(jjj > iii && jjj > kkk){
@@ -546,8 +538,8 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
         //跌倒可能性大於墜落與安全
         }if(kkk > iii && kkk > jjj ){
             ans = 2;
+        }else{;
         }
-        count = ans;
         Log.d(TAG,"ans="+ans);
         return ans;
     }
@@ -562,45 +554,51 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
         return fileChannel.map(FileChannel.MapMode.READ_ONLY,startOffset,declaredLength);
     }
 
-    //進行階層門檻判斷
-    private void judgeD(ArrayList<Integer> clist) {
 
-        for (int i= 1 ; i < clist.size(); i++){   //clist維持10個矩陣
-            if (clist.get(i) == 1){
-                drop_count++;
+    private void judgeD(Integer prediction) {
+        GlobalVariable gv = (GlobalVariable) getApplicationContext();
+        //p=1 count+
+        if(prediction == 1){
+            drop_count=drop_count+1;
+        }
+        //p=2 count+
+        if(prediction == 2 ){
+            fall_count=fall_count+1;
+        }
+        //p=0 如果count=0不再扣，不等於０扣
+        if(prediction == 0) {
+            if (fall_count < 1) {
+                fall_count = 0;
             }
-            if (clist.get(i) == 2){
-                fall_count++;
-                Log.d(TAG,"ansf="+fall_count);
+            if (drop_count < 1) {
+                drop_count = 0;
+            } else {
+                drop_count = drop_count-1;
+                fall_count = fall_count-2; //扣2誤判比較少
             }
         }
-        if (drop_count>6){
+
+        if (drop_count > 6) {
             alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_DROP); //墜落
             saveData(Constants.ACTION.ALARM_ACCIDENTS_DROP);
-            drop_count=0;
         }
-        if(fall_count>5){
+        if (fall_count > 5) {
             alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_FALL); //跌倒
             saveData(Constants.ACTION.ALARM_ACCIDENTS_FALL);
-            fall_count=0;
-        }
-        if(fall_count+drop_count==0){
+        } else {
+            gv.setOK(true);//後面儲存才會是正常
             saveData("normal");
-        } else{
-            saveData(Constants.ACTION.ALARM_PORTENTS_LOST_BALALNCE);
-            drop_count=0;
-            fall_count=0;
         }
     }
     //判斷昏迷
-    private void judgeDanger(float svmVal) {
+    private void judgeDanger(float svmd) {
 
-        //陣列保持五個數值在裡面 (保留0.5秒間的數值)
+        //陣列保持10個數值在裡面 (保留1秒間的數值)
         if (dangerList.size() < 10) {
-            dangerList.add(svmVal);
+            dangerList.add(svmd);
         } else {
             dangerList.remove(0);
-            dangerList.add(svmVal);
+            dangerList.add(svmd);
         }
         //算出0.5秒間的平均值
         float svmVal_sum = 0.0f;
@@ -613,15 +611,15 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
         if (svmVal_average < Threshold_Coma + sensitivityComa && Math.pow((mRoll * mRoll + mPitch * mPitch), 0.5) > 5) {
             count_coma++;
         } else count_coma = 0;
-
+        count=count_coma;
         if (count_coma >= comatime) {
             alarmAccidents(Constants.ACTION.ALARM_ASK);//昏迷
         }
-        if (count_coma >= comatime+3000) {
+        if (count_coma >= comatime+1200) {
             count_coma = 0;
             alarmAccidents(Constants.ACTION.ALARM_ACCIDENTS_COMA);//昏迷
             saveData(Constants.ACTION.ALARM_ACCIDENTS_COMA);
-            saveDataBase(Constants.ACTION.ALARM_ACCIDENTS_COMA, svmVal);
+            saveDataBase(Constants.ACTION.ALARM_ACCIDENTS_COMA, svmd);
         }
     }
 /*
@@ -869,6 +867,7 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
                     saveDataState(Constants.ACCIDENTS.DROP,Constants.PORTENTS.NORMAL);
                 }
                 count_accident++;
+                drop_count=0;
                 break;
 
             //跌倒時存的資料
@@ -895,6 +894,7 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
                     saveDataState(Constants.ACCIDENTS.FALL,Constants.PORTENTS.NORMAL);
                 }
                 count_accident++;
+                fall_count=0;
                 break;
 
             //昏迷時存的資料
@@ -1011,26 +1011,21 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
     //決定關鍵數據(accident, accidentAns, portent, portentAns)
     private void saveDataState(int accident, int portent) {
         if (Site.equals(null) || UserId.equals(null)) return;
-        saveCsv(getCurrentDate(), getCurrentTime(), Xval, Yval, Zval,Pval,Rval,SVM,SVMo,count,accident);
+        saveCsv(getCurrentDate(), getCurrentTime(), Xval, Yval, Zval,SVM,SVMo,count,accident);
         //saveFireBase(UserId, DeviceId, getCurrentDate(), getCurrentTime(), latitude, longitude, x, y, z, accident,portent, Site, altitude,heartRate, gettoken(), getMachine(), getMachineName(), getReceiveAns());
     }
      //將csvList存入.csv檔
-     private void saveCsv(String date, String time, float accX, float accY, float accZ,float pitch,float roll,float SVM,float SVMo, int count, int accident){
+     private void saveCsv(String date, String time, float accX, float accY, float accZ,float SVM,float SVMo, int count, int accident){
         CSVDataBean apacheBean = new CSVDataBean();
         apacheBean.setDate(date);
         apacheBean.setTime(time);
         apacheBean.setAccX(accX);
         apacheBean.setAccY(accY);
         apacheBean.setAccZ(accZ);
-        //apacheBean.setPitch(pitch);
-        //apacheBean.setRoll(roll);
         apacheBean.setSVM(SVM);
         apacheBean.setSVMo(SVMo);
         apacheBean.setCount(count);
         apacheBean.setAccident(accident);
-        //apacheBean.setPortent(portent);
-        //apacheBean.setSite(site);
-        //apacheBean.setAltitude(altitude);
             if(csvListChanger == 0){
                 csvDataBeanArrayList.add(apacheBean);
 //            Log.d(TAG, "saveCsvList1:" +csvDataBeanArrayList.size() );
@@ -1072,17 +1067,10 @@ public class ForeService extends Service implements SensorEventListener, GoogleA
                          mList.get(i).getAccX(),
                          mList.get(i).getAccY(),
                          mList.get(i).getAccZ(),
-                         //mList.get(i).getPitch(),
-                         //mList.get(i).getRoll(),
                          mList.get(i).getSVM(),
                          mList.get(i).getSVMo(),
                          mList.get(i).getCount(),
                          mList.get(i).getAccident());
-                         //mList.get(i).getLongitude(),
-                         //mList.get(i).getLatitude(),
-                         //mList.get(i).getPortent(),
-                         //mList.get(i).getSite(),
-                         //mList.get(i).getAltitude());
                 }
                 csvPrinter.printRecord();
                 csvPrinter.flush();
